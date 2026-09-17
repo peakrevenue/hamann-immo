@@ -1,11 +1,12 @@
 import { randomBytes, randomUUID, createHmac, timingSafeEqual, scryptSync } from 'node:crypto';
-import { validateLead } from './validation.mjs';
-const statuses = ['new','contacted','appointment','won','lost','archived'];
+import { validateLead,validateContact,roles,experiences,incomes,qualifies } from './validation.mjs';
+import {attribution,queueEvent,flushOutbox} from './webhook.mjs';
+const statuses = ['incomplete','disqualified','new','contacted','appointment','won','lost','archived'];
 const noCache = {'Cache-Control':'no-store','Content-Type':'application/json; charset=utf-8','X-Content-Type-Options':'nosniff'};
 export function passwordHash(password) {const salt = randomBytes(16).toString('hex');return salt+':'+scryptSync(password,salt,64).toString('hex');}
 function same(a,b) {const x=Buffer.from(a||''),y=Buffer.from(b||'');return x.length===y.length&&timingSafeEqual(x,y);}
 function verifyPassword(password,encoded) {try {const [salt,hash]=encoded.split(':');return same(scryptSync(password,salt,64).toString('hex'),hash);}catch{return false;}}
-export function createApi({store, config}) {
+export function createApi({store, config, fetcher=fetch}) {
   const sign = value => createHmac('sha256',config.secret).update(value).digest('base64url');
   const pack = value => {const data=Buffer.from(JSON.stringify(value)).toString('base64url');return data+'.'+sign(data);};
   const unpack = token => {try {const [data,mac]=token.split('.');if(!same(mac,sign(data)))return null;const value=JSON.parse(Buffer.from(data,'base64url'));return value.exp>Date.now()?value:null;}catch{return null;}};
@@ -48,11 +49,52 @@ export function createApi({store, config}) {
           const variant=url.searchParams.get('variant')==='B'?'B':'A';
           return json({id:e.id,variant,headline:variant==='B'?e.headline:'',cta:variant==='B'?e.cta:'',preview:true});
         }
-        const v=await visitor(req),e=await experiment(v);
+        const v=await visitor(req),e=url.searchParams.get('funnel')==='1'&&v.experiment?{id:v.experiment,variant:v.variant,headline:'',cta:''}:await experiment(v);
         v.experiment=e.id;v.variant=e.variant;
+        const previous=await store.get('attribution/'+v.id)||{};const incoming=Object.fromEntries([...url.searchParams].filter(([k])=>k.startsWith('utm_')));await store.set('attribution/'+v.id,attribution({...previous,...incoming}));
         const key=`visits/${e.id}/${v.id}`;
         if(!await store.get(key))await store.set(key,{experiment:e.id,variant:e.variant,createdAt:new Date().toISOString()});
         return json(e,200,{'Set-Cookie':cookie('hk_visit',pack(v),req,30*86400)});
+      }
+      if(path==='/contacts'&&method==='POST') {
+        if(data.website)return json({error:'Bitte versuche es erneut.'},400);
+        if(!await rate('contact:'+ip,20,3600000))return json({error:'Zu viele Anfragen. Bitte versuche es später erneut.'},429);
+        const checked=validateContact(data);if(checked.error)return json(checked,422);
+        const v=unpack(readCookie(req,'hk_visit'));if(v?.kind!=='visitor')return json({error:'Bitte lade die Seite neu und erlaube notwendige Cookies.'},400);let e;
+        if(v.experiment)e={id:v.experiment,variant:v.variant};else {e=await experiment(v);const key=`visits/${e.id}/${v.id}`;if(!await store.get(key))await store.set(key,{experiment:e.id,variant:e.variant,createdAt:new Date().toISOString()});}
+        const index='contact-index/'+sign(v.id+':'+checked.value.email);
+        const prior=await store.get(index);const digest=createHmac('sha256',config.secret).update(index).digest('hex').slice(0,32);const stableId=[digest.slice(0,8),digest.slice(8,12),digest.slice(12,16),digest.slice(16,20),digest.slice(20)].join('-');
+        const id=prior?.id||stableId,now=new Date().toISOString();const previous=await store.get('leads/'+id);
+        const utms=attribution({...await store.get('attribution/'+v.id),...previous?.attribution,...data.attribution});
+        const lead={...previous,id,...checked.value,createdAt:previous?.createdAt||now,consentedAt:now,updatedAt:now,status:previous?.status||'incomplete',notes:previous?.notes||'',role:previous?.role||null,experience:previous?.experience||null,income:previous?.income||null,qualification:previous?.qualification||'pending',stage:previous?.stage||'contact_saved',experiment:previous?.experiment||e.id,variant:previous?.variant||e.variant,attribution:utms};
+        await store.set('leads/'+id,lead);await store.set(index,{id});
+        const changed=previous&&['name','phone','country'].some(k=>previous[k]!==lead[k]);
+        const event=changed?'contact_updated':'contact_created';const contactSnapshot={...lead,role:null,experience:null,income:null,qualification:'pending',stage:'contact_saved'};await queueEvent(store,config,contactSnapshot,event,fetcher);
+        return json({ok:true},previous?200:201,{'Set-Cookie':cookie('hk_funnel',pack({kind:'funnel',id,exp:Date.now()+7200000}),req,7200)});
+      }
+      if(path==='/funnel'&&method==='GET') {
+        const f=unpack(readCookie(req,'hk_funnel'));if(f?.kind!=='funnel')return json({error:'Bitte hinterlege zuerst deine Kontaktdaten.'},401);
+        const l=await store.get('leads/'+f.id);if(!l)return json({error:'Bitte starte deine Anfrage erneut.'},404);
+        return json({name:l.name,email:l.email,phone:l.phone,country:l.country,role:l.role,experience:l.experience,income:l.income,qualification:l.qualification,attribution:l.attribution});
+      }
+      if(path==='/quiz'&&method==='POST') {
+        const f=unpack(readCookie(req,'hk_funnel'));if(f?.kind!=='funnel')return json({error:'Bitte hinterlege zuerst deine Kontaktdaten.'},401);
+        if(!await rate('quiz:'+f.id,80,3600000))return json({error:'Zu viele Anfragen. Bitte versuche es später erneut.'},429);
+        const l=await store.get('leads/'+f.id);if(!l)return json({error:'Anfrage nicht gefunden.'},404);
+        if(!['role','experience','income'].includes(data.step))return json({error:'Ungültiger Schritt.'},422);
+        const allowed={role:roles,experience:experiences,income:incomes};if(!allowed[data.step].includes(data.value))return json({error:'Bitte wähle eine Antwort.'},422);
+        if(data.step!=='role'&&!l.role||data.step==='income'&&!l.experience)return json({error:'Bitte beantworte zuerst die vorherigen Fragen.'},422);
+        const lead={...l,[data.step]:data.value,updatedAt:new Date().toISOString(),stage:data.step,attribution:attribution({...l.attribution,...data.attribution})};
+        // Editing an earlier answer invalidates dependent answers and qualification.
+        if(data.step==='role'){lead.experience=null;lead.income=null;}
+        if(data.step==='experience')lead.income=null;
+        const finished=lead.role==='unemployed'||data.step==='income';
+        lead.qualification=finished?(qualifies(lead.role,lead.income)?'qualified':'disqualified'):'pending';
+        lead.status=finished?(lead.qualification==='qualified'?'new':'disqualified'):'incomplete';
+        if(finished){lead.stage='completed';lead.completedAt=new Date().toISOString();}
+        await store.set('leads/'+lead.id,lead);
+        if(finished)await queueEvent(store,config,lead,'quiz_completed',fetcher);
+        return json({ok:true,qualification:lead.qualification,next:finished?(lead.qualification==='qualified'?'/termin/':'/interesse/'):null});
       }
       if(path==='/leads'&&method==='POST') {
         if(data.website)return json({error:'Bitte versuche es erneut.'},400);
@@ -63,12 +105,19 @@ export function createApi({store, config}) {
         if(existing)return json({ok:true},200,{'Set-Cookie':cookie('hk_booking',pack({kind:'booking',id:existing.id,exp:Date.now()+7200000}),req,7200)});
         const e={id:v.experiment||'control',variant:v.variant||'A'},id=v.id,createdAt=new Date().toISOString();
         const attribution={};for(const k of ['utm_source','utm_medium','utm_campaign','utm_content','utm_term'])if(typeof data.attribution?.[k]==='string')attribution[k]=data.attribution[k].slice(0,150);
-        const lead={id,...checked.value,createdAt,consentedAt:createdAt,status:'new',notes:'',experiment:e.id,variant:e.variant,attribution};
+        const lead={id,...checked.value,createdAt,consentedAt:createdAt,status:'new',notes:'',qualification:'qualified',stage:'completed',experiment:e.id,variant:e.variant,attribution};
         if (store.create) await store.create('leads/'+id,lead); else if(!await store.get('leads/'+id)) await store.set('leads/'+id,lead);
         await store.set('submissions/'+v.id,{id});
+        await queueEvent(store,config,lead,'quiz_completed',fetcher);
         return json({ok:true},201,{'Set-Cookie':cookie('hk_booking',pack({kind:'booking',id,exp:Date.now()+7200000}),req,7200)});
       }
-      if(path==='/booking'&&method==='GET') {const b=unpack(readCookie(req,'hk_booking'));if(b?.kind!=='booking')return json({error:'Bitte stelle zuerst deine Gesprächsanfrage.'},403);const l=await store.get('leads/'+b.id);return l?json({name:l.name,email:l.email,phone:l.phone}):json({error:'Anfrage nicht gefunden.'},404);}
+      if(path==='/booking'&&method==='GET') {
+        const token=unpack(readCookie(req,'hk_funnel'))||unpack(readCookie(req,'hk_booking'));
+        if(!['funnel','booking'].includes(token?.kind))return json({error:'Bitte stelle zuerst deine Gesprächsanfrage.'},403);
+        const l=await store.get('leads/'+token.id);
+        if(!l||!qualifies(l.role,l.income)||l.qualification&&l.qualification!=='qualified')return json({error:'Bitte schließe zuerst die Fragen zu deiner Situation ab.'},403);
+        return json({name:l.name,email:l.email,phone:l.phone,attribution:attribution(l.attribution)});
+      }
       if(path==='/login'&&method==='POST') {
         if(!config.adminEmail || !config.passwordHash)return json({error:'Der Admin-Zugang ist noch nicht eingerichtet.'},503);
         if(!await rate('login:'+ip,8,15*60000))return json({error:'Zu viele Anmeldeversuche. Bitte warte 15 Minuten.'},429);
@@ -81,6 +130,8 @@ export function createApi({store, config}) {
       const session=await auth(req);if(!session)return json({error:'Bitte melde dich an.'},401);
       if(path==='/admin/logout'&&method==='POST') {await store.delete('sessions/'+session.id);return json({ok:true},200,{'Set-Cookie':cookie('hk_admin','',req,0)});}
       if(path==='/admin/me'&&method==='GET')return json({email:config.adminEmail,local:!!config.local});
+      if(path==='/admin/webhooks/retry'&&method==='POST'){await flushOutbox(store,config,fetcher);return json({ok:true});}
+      if(path==='/admin/webhooks'&&method==='GET'){const jobs=await store.list('outbox/');return json({configured:!!config.webhookUrl&&!config.webhookDisabled,pending:jobs.filter(j=>!j.deliveredAt).length,delivered:jobs.filter(j=>j.deliveredAt).length});}
       if(path==='/admin/leads'&&method==='GET')return json({leads:(await store.list('leads/')).sort((a,b)=>b.createdAt.localeCompare(a.createdAt))});
       if(path.startsWith('/admin/leads/')&&method==='PATCH') {
         const id=path.split('/').pop();if(!/^[a-f0-9-]{36}$/.test(id))return json({error:'Ungültige ID.'},400);
@@ -91,7 +142,7 @@ export function createApi({store, config}) {
       if(path==='/admin/experiments'&&method==='GET') {
         const exps=await store.list('experiments/'),active=await store.get('settings/active');
         const [visits,leads]=await Promise.all([store.list('visits/'),store.list('leads/')]);
-        const results=exps.map(e=>({...e,active:active?.id===e.id,results:['A','B'].map(variant=>({variant,visits:visits.filter(v=>v.experiment===e.id&&v.variant===variant).length,leads:leads.filter(l=>l.experiment===e.id&&l.variant===variant).length}))}));
+        const results=exps.map(e=>({...e,active:active?.id===e.id,results:['A','B'].map(variant=>({variant,visits:visits.filter(v=>v.experiment===e.id&&v.variant===variant).length,leads:leads.filter(l=>l.experiment===e.id&&l.variant===variant&&(!l.qualification||l.qualification==='qualified')).length}))}));
         return json({experiments:results.sort((a,b)=>b.createdAt.localeCompare(a.createdAt))});
       }
       if(path==='/admin/experiments'&&method==='POST') {

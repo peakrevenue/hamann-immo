@@ -18,3 +18,14 @@
     X-Robots-Tag = "noindex, nofollow"
     Cache-Control = "no-store"
     X-Frame-Options = "DENY"
+
+[[redirects]]
+  from = "/danke"
+  to = "/termin/"
+  status = 301
+  force = true
+[[redirects]]
+  from = "/danke/"
+  to = "/termin/"
+  status = 301
+  force = true

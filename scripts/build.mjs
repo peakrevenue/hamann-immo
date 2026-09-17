@@ -1,3 +1,3 @@
-import { build } from 'esbuild';
-await build({entryPoints:['client/quiz.js'],bundle:true,minify:true,format:'iife',outfile:'wireframe/perspective-abstrakt/quiz.js'});
-console.log('Quiz und Telefonnummernprüfung gebaut.');
+import {build} from 'esbuild';
+await build({entryPoints:['client/quiz.js','client/site.js'],bundle:true,minify:true,format:'iife',outdir:'wireframe/perspective-abstrakt'});
+console.log('Landingpage, Kontaktformular und Quiz gebaut.');
