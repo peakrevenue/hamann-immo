@@ -1,0 +1,80 @@
+/* Hamann & Kollegen light theme. Source: hamann-kollegen.de, 17 Sep 2026.
+   Original brand colors: Navy #1c3553, Gold #d0a065.
+   Copy and Perspective section order intentionally retained. */
+:root{--paper:#fff;--ink:#1c3553;--muted:#607080;--blue:#1c3553;--navy:#1c3553;--gold:#d0a065;--gold-ink:#886131;--cream:#f6f5f3;--line:#e3e6e8}
+body{background:#fff;color:var(--navy);font-family:'Figtree',Arial,sans-serif}
+h1{font-family:'Inter',Arial,sans-serif;font-weight:600;letter-spacing:-1.8px;line-height:1.17}
+h2,h3{font-family:'Outfit','Inter',Arial,sans-serif;font-weight:500;letter-spacing:-.9px}
+h3{letter-spacing:-.35px}
+p{color:#596878}.lead{font-weight:400}.micro{color:#74808b}.label{color:var(--gold-ink);letter-spacing:1.8px}
+.review{background:var(--cream);color:#6a7681;border-color:#e9e7e3}
+.hero{background:#fff;padding-top:42px}.hero h1{margin-top:28px;max-width:960px}.hero .lead{max-width:850px}.hero .audience{color:var(--gold-ink);font-size:13px;letter-spacing:1.2px;text-transform:uppercase}
+.brand{display:block;width:295px;height:auto;margin:0 auto 38px;padding:0;background:none;border-radius:0;box-shadow:none;line-height:1}.brand img{display:block;width:100%;height:auto}
+.badge{border-color:#e4d3bb;background:#faf6f0;color:var(--navy);font-size:12px}.badge span{color:var(--gold-ink);border-color:#e4d3bb}
+.button{font-family:'Figtree',Arial,sans-serif;background:var(--gold);color:#1c3553;border:1px solid #c79559;border-radius:10px;font-size:20px;font-weight:700;gap:24px;box-shadow:0 4px 12px #1c355308;transition:background .15s,transform .15s,box-shadow .15s}
+.button:after{content:'›';font-size:28px;font-weight:400;line-height:.7}.button:hover{background:#dbae78;box-shadow:0 6px 18px #1c355312;transform:translateY(-2px)}a:focus-visible,button:focus-visible,summary:focus-visible{outline-color:#886131}
+.logos{color:#8c959e}.hero-video{background:var(--navy);color:#fff;border:1px solid #344d68;border-radius:14px}.hero-video h3{color:#fff;font-family:'Figtree',Arial,sans-serif;font-weight:500}.video-stage{background:radial-gradient(ellipse at 50% 100%,#3b526c,#203a56 55%,#1c3553)}.video-stage p{color:#e3e8ec}.video-stage small{color:#b3bec9}.play{color:#e3c69f;border-color:#b79569}
+.blue{background:var(--cream);background-image:none;color:var(--navy);border:1px solid #e8e2d9;border-radius:16px;padding-block:68px}.blue p{color:#617080}.blue .micro{color:#7b746a}.blue h2{max-width:890px}
+.tool-icons span{background:linear-gradient(135deg,#e0bd8e,#c69659);color:var(--navy);border-color:#e5d1b6;box-shadow:0 9px 20px #1c355314}.tool-icons span:nth-child(2){background:#1c3553;color:#f0dcc1;border-color:#3a516c}.tool-icons span:nth-child(3){background:linear-gradient(135deg,#f3e9db,#d8b584);color:#1c3553}.tool-icons span:nth-child(4){background:#fff;color:#1c3553;border-color:#ddd8d0}
+.proof{background:#fafafa;border:1px solid var(--line)}.avatar{background:#e6ebee;color:#5c6e7f}.stars{color:#b88a4f}.proof .micro{color:#697582}.proof p{color:#617080}
+.insight{border-color:#d9c5a8}.system article{background:#f8f9fa;border:1px solid var(--line)}.visual{background:radial-gradient(ellipse at bottom,#e8dbc8,#f0eeea)}.phone{border-color:#1c3553;box-shadow:12px 15px 20px #1c355316}.phone i{background:#1c3553}.phone span{background:#f4e9da;color:#886131}.flow span{border-color:#d8ccbb;color:#1c3553}.flow b{color:#a97b42}.tiles i{color:#1c3553}.tiles i:last-child{background:#1c3553;color:#f0dcc1}
+.fit article{background:#f8f9fa;border:1px solid var(--line)}.fit .muted{background:#f2f1ef}.fit li{color:#5a6877}.fit li:before{background:#d0a065;color:#1c3553}.fit .muted li:before{background:#b7bcc2;color:#fff}
+.case{background:#fafbfc;border-color:var(--line)}.case-left{border-color:var(--line)}.case-media{background:linear-gradient(140deg,#e9ecef,#dde3e8);color:#657789}.case-media .play{color:#8c693b;border-color:#bda682}.case .person{color:var(--navy)}
+.book{background:var(--navy);color:#fff;box-shadow:0 20px 30px #1c355322}.book span{color:#c5ced8}.ticket{background:var(--gold);color:var(--navy);box-shadow:0 20px 30px #1c355322}.roadmap{border:1px solid #ebe4da;color:#8b6b45;box-shadow:0 20px 30px #1c355319}.roadmap b{color:var(--navy)}.benefits article{border-color:var(--line)}.benefit-icon{background:var(--navy);color:#e4c79f}.blue-icon{background:var(--gold);color:var(--navy)}.light{background:#fff;border-color:#dfd6c8}.light span{color:#886131;border-color:#dfd6c8}
+.portrait{background:linear-gradient(135deg,#304963,#1c3553)}.portrait>span{color:#d3dde5}.silhouette{background:linear-gradient(#6e8194,#405a75)}.silhouette:before{background:#6e8194}.signature{color:#98713f}.host small{color:#697582}details{border-color:var(--line)}summary:after{color:#a87c43}footer{border-color:var(--line);background:var(--cream);color:#6d7a87}footer p{color:#6d7a87}
+dialog{color:var(--navy);font-family:'Figtree',Arial,sans-serif}dialog::backdrop{background:#10233999}.close{color:var(--navy)}.form-placeholder span{border-color:#d1d8df;color:#6f7c88}.form-placeholder b{background:var(--gold);color:var(--navy)}
+@media(max-width:700px){.hero{padding-top:32px}.brand{width:250px;margin-bottom:30px}.hero .audience{font-size:11px;letter-spacing:1px}h1{font-size:34px;letter-spacing:-1.2px}h2{letter-spacing:-.8px}.button{font-size:18px;gap:18px;padding:15px 22px}.blue{padding:45px 22px}.case-left{border-color:var(--line)}}
+@media(prefers-reduced-motion:reduce){.button{transition:none}}
+
+/* Supplied introduction video: preserve its native aspect ratio. */
+.video-stage.video-live{position:relative;display:block;min-height:0;background:var(--navy);margin:20px -25px 0}
+#video1{display:block;width:100%;height:auto;max-height:75vh;background:var(--navy);border-radius:10px;object-fit:contain}
+#toggleSound1{position:absolute;left:20px;top:20px;display:flex;align-items:center;gap:10px;padding:5px 17px 5px 6px;min-height:47px;border:1px solid #ffffff90;border-radius:100px;background:rgba(255,255,255,.92);box-shadow:0 4px 14px #10233924;color:#795329;font:500 14px 'Inter',Arial,sans-serif;cursor:pointer;z-index:1}
+#toggleSound1 svg{flex-shrink:0}#toggleSound1:hover{background:#fff}#toggleSound1 .sound-waves{display:none}#toggleSound1[aria-pressed="true"] .sound-waves{display:block}#toggleSound1[aria-pressed="true"] .sound-slash{display:none}
+.video-stage .video-error{margin:0;padding:24px;color:#fff;font-size:16px}
+@media(max-width:700px){.video-stage.video-live{margin-inline:-15px}#toggleSound1{left:12px;top:12px;font-size:12px;gap:7px;padding-right:12px;min-height:42px}#toggleSound1 svg{width:30px;height:30px}}
+
+/* Video starts directly at the top of its container. */
+.hero-video{padding:0}
+.hero-video .video-stage.video-live{margin:0}
+
+/* Customer interviews, supplied reference layout and original graph assets. */
+#kundenstimmen #cases{margin-top:42px}.case.testimonial{background:var(--navy);border:0;border-radius:12px;grid-template-columns:1fr 1fr;margin:0 0 40px;align-items:stretch}
+.testimonial-left{min-width:0;background:var(--navy);color:#fff}.testimonial-video{display:block;width:100%;height:auto;aspect-ratio:16/9;object-fit:contain;background:var(--navy)}
+.testimonial-quote{padding:27px 40px 38px}.quote-mark{display:block;color:var(--gold);font:80px/0.75 Georgia,serif;height:43px}.testimonial blockquote{font-family:'Figtree',Arial,sans-serif;font-style:italic;font-weight:600;font-size:21px;line-height:1.5;margin:12px 0 24px;color:#fff}.testimonial .person{color:#fff;font-style:italic;font-size:21px;font-weight:600;margin:0 0 7px}.testimonial .person-role{color:#e8edf3;font-size:16px}
+.testimonial-right{padding:40px;background:var(--gold);color:var(--navy);display:flex;flex-direction:column;align-items:stretch}.testimonial-right h3{font-size:29px;line-height:1.25;font-weight:600;letter-spacing:-.5px;margin-bottom:12px}.testimonial-right p{font-size:17px;line-height:1.55;color:var(--navy)}.testimonial-right ul{list-style:none;padding:0;margin:22px 0}.testimonial-right li{position:relative;padding-left:35px;font-size:16px;line-height:1.55;margin:0 0 18px}.testimonial-right li:last-child{margin-bottom:0}.testimonial-right li:before{content:'✓';position:absolute;top:2px;left:0;width:24px;height:24px;border-radius:50%;background:white;color:#91662f;text-align:center;font-weight:700;line-height:24px}.testimonial-right img{display:block;width:100%;height:auto;aspect-ratio:8/3;border-radius:18px;margin-top:auto}.testimonial-error{color:#fff;padding:16px;font-size:14px}
+@media(max-width:900px){.testimonial-right{padding:28px}.testimonial-quote{padding:25px 28px 30px}.testimonial-right h3{font-size:25px}.testimonial blockquote{font-size:19px}}
+@media(max-width:700px){.case.testimonial{grid-template-columns:1fr;margin-bottom:26px}.testimonial-quote{padding:26px}.testimonial-right{padding:28px 24px}.testimonial-right h3{font-size:25px}.testimonial-right p,.testimonial-right li{font-size:16px}.testimonial-right img{border-radius:12px}.testimonial .person{font-size:20px}}
+
+/* Requested white lettering and original press logos. */
+.button,.button:hover,.form-placeholder b{color:#fff}
+.testimonial-right,.testimonial-right h3,.testimonial-right p,.testimonial-right li{color:#fff}
+.press-strip{display:flex;align-items:center;gap:36px;padding:25px 0;margin:20px 0 30px;text-align:left}
+.press-label{border-left:3px solid var(--navy);padding:23px 0 23px 14px;color:#333;font-size:17px;font-weight:700;white-space:nowrap}
+.press-logos{display:flex;align-items:center;justify-content:space-between;gap:24px;flex:1;min-width:0}
+.press-logos img{display:block;width:100%;max-width:145px;max-height:40px;object-fit:contain;min-width:0;flex:1}
+.press-logos .press-forbes{max-width:110px}.press-logos .press-immobilien{max-width:180px}.press-logos .press-leipziger{max-width:130px}.press-logos .press-muenchner{max-width:105px}.press-logos .press-abendblatt{max-width:170px}
+.proof{display:flex;flex-direction:column;align-items:center;padding:34px 27px}.proof-portrait{display:block;width:88px;height:88px;object-fit:cover;border-radius:50%;margin-bottom:17px;border:3px solid #e8d7bf}.proof h3{font-size:21px}.proof .micro{margin:4px 0 20px}.proof-quote{font-style:italic;line-height:1.6}.proof-link{margin-top:auto;padding-top:22px;font-size:13px;font-weight:600;text-decoration:none;color:#8b6332}.proof-link:hover{text-decoration:underline}
+@media(max-width:900px){.press-strip{gap:22px}.press-logos{gap:16px}.press-label{font-size:15px}}
+@media(max-width:700px){.press-strip{flex-direction:column;align-items:stretch;gap:18px;padding:18px 0;margin-bottom:24px}.press-label{padding:8px 0 8px 12px}.press-logos{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:23px 18px;justify-items:center}.press-logos img{max-height:30px;width:100%;max-width:120px!important}.press-logos .press-abendblatt{grid-column:2 / 4;max-width:170px!important}.proof{padding:30px 26px}.proof-portrait{width:80px;height:80px}}
+
+/* Four deliberate desktop lines, natural wrapping on smaller screens. */
+.hero .hero-headline{font-size:40px;line-height:1.22;letter-spacing:-1.25px}
+.hero-headline>span{display:block}
+@media(min-width:1000px){.hero-headline>span{white-space:nowrap}}
+@media(min-width:701px) and (max-width:999px){.hero .hero-headline{font-size:clamp(27px,4vw,39px);letter-spacing:-1px}}
+@media(max-width:700px){.hero .hero-headline{font-size:32px;line-height:1.2;letter-spacing:-1px}.hero-headline>span{display:inline}.hero-headline>span:first-child{display:block;margin-bottom:14px}.hero .badge{font-size:10px;row-gap:6px;max-width:100%}}
+
+/* Henrik: original transparent artwork and white signature on brand navy. */
+.host-section{background:var(--navy);color:#fff;margin-top:70px}
+.host-section .host{gap:54px;grid-template-columns:1fr 1.06fr;align-items:center}
+.host-visual{position:relative;min-width:0;align-self:center}
+.host-photo{display:block;width:100%;height:auto;mix-blend-mode:normal}
+.host-quote{position:relative;z-index:1;margin:-115px 5px 0;padding:20px 27px 25px;background:var(--gold);border:1px solid #fff;border-radius:12px;text-align:center}
+.host-quote>span{display:block;font:72px/.7 Georgia,serif;height:39px;color:white}
+.host-section .host-quote p{font-size:18px;line-height:1.45;font-weight:700;font-style:italic;text-transform:uppercase;color:#fff;margin:5px 0 0}
+.host-section h2{color:#fff;margin-bottom:25px}.host-section .label{color:#dfba88}.host-section .host-copy p{color:#e6ecf2;font-size:18px;line-height:1.65;margin:20px 0}
+.host-signature{display:block;width:175px;height:auto;max-width:100%;margin:25px 0 12px}
+.host-name{font-family:'Outfit',Arial,sans-serif;font-size:21px;font-weight:500;margin-bottom:5px}.host-section small{color:#c5d0dc;font-size:13px}
+@media(max-width:900px){.host-section .host{gap:30px}.host-quote{margin-top:-85px;padding:18px}.host-section .host-quote p{font-size:15px}}
+@media(max-width:700px){.host-section{margin-top:45px}.host-section .host{grid-template-columns:1fr;gap:40px}.host-visual{width:100%;max-width:520px;margin:auto}.host-quote{margin-top:-80px}.host-section .host-copy p{font-size:17px}.host-signature{width:150px}.host-section .host-quote p{font-size:16px}}
