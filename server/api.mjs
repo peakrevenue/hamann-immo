@@ -131,7 +131,7 @@ export function createApi({store, config, fetcher=fetch}) {
       if(path==='/admin/logout'&&method==='POST') {await store.delete('sessions/'+session.id);return json({ok:true},200,{'Set-Cookie':cookie('hk_admin','',req,0)});}
       if(path==='/admin/me'&&method==='GET')return json({email:config.adminEmail,local:!!config.local});
       if(path==='/admin/webhooks/retry'&&method==='POST'){await flushOutbox(store,config,fetcher);return json({ok:true});}
-      if(path==='/admin/webhooks'&&method==='GET'){const jobs=await store.list('outbox/');return json({configured:!!config.webhookUrl&&!config.webhookDisabled,pending:jobs.filter(j=>!j.deliveredAt).length,delivered:jobs.filter(j=>j.deliveredAt).length});}
+      if(path==='/admin/webhooks'&&method==='GET'){const jobs=await store.list('outbox/');return json({configured:!!config.webhookUrl&&!config.webhookDisabled,quizConfigured:!!config.quizWebhookUrl&&!config.webhookDisabled,pending:jobs.filter(j=>!j.deliveredAt).length,delivered:jobs.filter(j=>j.deliveredAt).length});}
       if(path==='/admin/leads'&&method==='GET')return json({leads:(await store.list('leads/')).sort((a,b)=>b.createdAt.localeCompare(a.createdAt))});
       if(path.startsWith('/admin/leads/')&&method==='PATCH') {
         const id=path.split('/').pop();if(!/^[a-f0-9-]{36}$/.test(id))return json({error:'Ungültige ID.'},400);

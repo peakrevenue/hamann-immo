@@ -15,7 +15,7 @@ export function validateContact(data) {
   const phone = phoneNumber(data.phone, data.country);
   if (!phone) return {error:'Bitte gib eine gültige Telefonnummer für das gewählte Land ein.'};
   if (data.consent !== true) return {error:'Bitte bestätige die Kontaktaufnahme.'};
-  return {value:{name:data.name.trim(),email:data.email.trim().toLowerCase(),phone,country:data.country,consentVersion:'contact-first-2026-09-17'}};
+  return {value:{name:data.name.trim(),email:data.email.trim().toLowerCase(),phone,country:data.country,consentVersion:'contact-submit-2026-09-17'}};
 }
 export function validateLead(data) {
   if (!roles.includes(data.role) || !experiences.includes(data.experience) || !incomes.includes(data.income)) return {error:'Bitte beantworte alle Fragen.'};

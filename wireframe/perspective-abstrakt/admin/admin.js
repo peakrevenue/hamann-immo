@@ -12,7 +12,7 @@
  $('#login-form').addEventListener('submit',async event=>{event.preventDefault();const button=event.submitter;button.disabled=true;$('#login-error').textContent='';try{const data=Object.fromEntries(new FormData(event.target));await api('login',{method:'POST',body:data});event.target.password.value='';await enter();}catch(e){$('#login-error').textContent=e.message;}finally{button.disabled=false;}});
  $('#logout').addEventListener('click',async()=>{try{await api('admin/logout',{method:'POST',body:{}});location.reload();}catch(e){message(e.message);}});
  async function refresh(){try{leads=(await api('admin/leads')).leads;renderLeads();await webhookState();}catch(e){message(e.message);}}
- async function webhookState(){const s=await api('admin/webhooks');$('#webhook-state').textContent=(s.configured?'Zapier aktiviert':'Zapier-Versand pausiert / noch nicht konfiguriert')+' · '+s.delivered+' gesendet · '+s.pending+' ausstehend';}
+ async function webhookState(){const s=await api('admin/webhooks');$('#webhook-state').textContent='Kontaktdaten: '+(s.configured?'aktiv':'pausiert / fehlt')+' · Quiz: '+(s.quizConfigured?'aktiv':'pausiert / fehlt')+' · '+s.delivered+' gesendet · '+s.pending+' ausstehend';}
  $('#retry-webhooks').addEventListener('click',async()=>{const b=$('#retry-webhooks');b.disabled=true;try{await api('admin/webhooks/retry',{method:'POST',body:{}});await webhookState();}catch(e){message(e.message);}finally{b.disabled=false;}});
  function filtered(){const query=$('#search').value.toLowerCase(),status=$('#status-filter').value;return leads.filter(l=>(!status||l.status===status)&&`${l.name} ${l.email} ${l.phone}`.toLowerCase().includes(query));}
  function renderLeads(){

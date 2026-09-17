@@ -51,11 +51,11 @@ Der Catch-Hook wird als `HAMANN_ZAPIER_WEBHOOK_URL` ausschließlich auf dem Serv
 
 Ereignisse:
 
-- `contact_created`: erste Kontaktübermittlung, bevor das Quiz beginnt; Qualifikation `pending`.
-- `quiz_completed`: vollständiges Ergebnis, einschließlich `qualified` oder `disqualified`. Eine arbeitslose Rolle beendet das Quiz bereits nach der Rollenfrage.
+- `contact_created`: erste Kontaktübermittlung, bevor das Quiz beginnt; Qualifikation `Noch offen`.
+- `quiz_completed`: vollständiges Ergebnis, einschließlich `Qualifiziert` oder `Nicht passend`. Eine arbeitslose Rolle beendet das Quiz bereits nach der Rollenfrage.
 - `contact_updated`: später korrigierte Kontaktdaten.
 
-Jedes Ereignis enthält `event_id`, `lead_id`, `name`, `email`, `phone`, `country`, Antworten, Qualifikation, Bearbeitungsstand, Zeitstempel, Kontaktfreigabe-Version und A/B-Zuordnung. `lead_id` ist der Schlüssel zum Aktualisieren desselben Kontakts in Zapier. Für qualifizierte Abschlüsse im Zap auf `event = quiz_completed` UND `qualification = qualified` filtern. Frühe Kontaktdaten nicht als qualifizierten Abschluss zählen.
+Jedes Ereignis enthält `event_id`, `lead_id`, `name`, `email`, `phone`, `country`, Antworten, Qualifikation, Bearbeitungsstand, Zeitstempel, Kontaktfreigabe-Version und A/B-Zuordnung. `lead_id` ist der Schlüssel zum Aktualisieren desselben Kontakts in Zapier. Für qualifizierte Abschlüsse im Zap auf `event = quiz_completed` UND `qualification_code = qualified` filtern. Frühe Kontaktdaten nicht als qualifizierten Abschluss zählen.
 
 Alle `utm_*`-Parameter werden von der Landingpage per Query-String und Session-Speicherung über `/anfrage`, `/quiz` und `/termin` erhalten. Auf dem Server werden sie zusätzlich am Besucher und anschließend am Lead gespeichert. Im Hook stehen sie sowohl als einzelne Felder als auch unter `attribution`. Standardfelder werden bei Direktzugriff mit leerem Wert geliefert; zusätzliche UTM-Felder werden ebenfalls übernommen. Kalender-Einbettung und Kalender-Fallbacklink erhalten die gespeicherten UTM-Werte.
 
@@ -94,3 +94,9 @@ Browserprüfung: Mobile Kontaktformularansicht, negative Telefonnummernprüfung,
 - `wireframe/perspective-abstrakt/admin/`: Admin-Oberfläche.
 
 Der Datenschutzhinweis verlinkt die offizielle Hamann-Erklärung. Neue Datenverarbeitung (Quiz/CRM, 30-Tage-Zuordnung und Calendly-Vorbelegung) muss in den eingesetzten Datenschutz- und Cookie-Informationen abgebildet werden. Die bestehende Copy enthält weiterhin die vom Auftraggeber vorgegebenen 30 Minuten an einer Stelle und 20 Minuten an anderen Stellen.
+
+Die Kontakt-Ereignisse gehen an `HAMANN_ZAPIER_WEBHOOK_URL`, Quiz-Abschlüsse ausschließlich an `HAMANN_ZAPIER_QUIZ_WEBHOOK_URL` (lokal `quizWebhookUrl`). Ohne zweiten Hook bleiben Abschlüsse in der Outbox gespeichert. Kein erneuter Versand durch das Laden der Terminseite.
+
+`role`, `experience`, `income`, `qualification` und `stage` enthalten deutsche Werte. Die ausgewählten Antworten entsprechen exakt den Optionen im Formular. `antworten` enthält alle Fragen, ausgewählte Antworten und mögliche Antworten. Für stabile Filter stehen zusätzlich `role_code`, `experience_code`, `income_code`, `qualification_code` bereit. Bestehende Zapier-Filter auf englische Antwortwerte auf diese Code-Felder umstellen.
+
+Das Kontaktformular verwendet einen Datenschutzhinweis unter dem Button ohne Checkbox. `consented_at` dokumentiert den aktiven Versand nach diesem Hinweis, nicht eine separate Checkbox; Version `contact-submit-2026-09-17`.
