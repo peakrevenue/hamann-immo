@@ -7,3 +7,5 @@
 wireframe/index.html
 wireframe/KONZEPT.md
 wireframe/perspective-abstrakt/landingpage.png
+node_modules/
+.local/
