@@ -10,7 +10,7 @@ await mkdir('.local',{recursive:true,mode:0o700});
 let config;
 try{config=JSON.parse(await readFile('.local/config.json','utf8'));}catch(e){if(e.code!=='ENOENT')throw e;
  const password=randomBytes(24).toString('base64url');
- config={adminEmail:'account@peak-revenue.ch',passwordHash:passwordHash(password),secret:randomBytes(48).toString('base64url'),local:true};
+ config={adminEmail:'admin@example.invalid',passwordHash:passwordHash(password),secret:randomBytes(48).toString('base64url'),local:true};
  await writeFile('.local/config.json',JSON.stringify(config),{mode:0o600});
  await writeFile('.local/admin-zugang.txt',`Nur lokale Entwicklung\nAdmin: http://127.0.0.1:8766/admin/\nE-Mail: ${config.adminEmail}\nPasswort: ${password}\nNicht veröffentlichen oder committen.\n`,{mode:0o600});
 }

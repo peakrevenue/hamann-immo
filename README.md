@@ -16,7 +16,7 @@ npm run dev
 - Bisherige Vorschau funktioniert ebenfalls: http://127.0.0.1:8766/wireframe/perspective-abstrakt/
 - Admin: http://127.0.0.1:8766/admin/
 - Zugang: `.local/admin-zugang.txt` (wird beim ersten Start erzeugt).
-- E-Mail: account@peak-revenue.ch. Kein Login über E-Mail-Versand; das Konto verwendet ein Passwort.
+- E-Mail: admin@example.invalid. Kein Login über E-Mail-Versand; das Konto verwendet ein Passwort.
 - Daten liegen ausschließlich lokal unter `.local/data/`, außerhalb des veröffentlichten Verzeichnisses. `.local/` und Zugangsdaten werden nicht in Git aufgenommen.
 
 ## Netlify aktivieren
