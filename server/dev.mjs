@@ -18,7 +18,7 @@ const store=fileStore(path.resolve('.local/data'));
 config.webhookDisabled=process.env.HAMANN_DISABLE_WEBHOOK==='1';
 const api=createApi({store,config});
 const retryTimer=setInterval(()=>flushOutbox(store,config).catch(()=>console.error('Webhook retry failed')),60000);retryTimer.unref();
-const types={'.ics':'text/calendar; charset=utf-8','.xml':'application/xml; charset=utf-8','.txt':'text/plain; charset=utf-8','.html':'text/html; charset=utf-8','.css':'text/css','.js':'text/javascript','.json':'application/json','.svg':'image/svg+xml','.png':'image/png','.avif':'image/avif','.gif':'image/gif','.webp':'image/webp','.woff2':'font/woff2','.ttf':'font/ttf','.mp4':'video/mp4'};
+const types={'.ics':'text/calendar; charset=utf-8','.xml':'application/xml; charset=utf-8','.txt':'text/plain; charset=utf-8','.html':'text/html; charset=utf-8','.css':'text/css','.js':'text/javascript','.json':'application/json','.svg':'image/svg+xml','.png':'image/png','.ico':'image/x-icon','.avif':'image/avif','.gif':'image/gif','.webp':'image/webp','.woff2':'font/woff2','.ttf':'font/ttf','.mp4':'video/mp4'};
 http.createServer(async(req,res)=>{try{
  const origin=`http://${req.headers.host}`,url=new URL(req.url,origin);
  if(url.pathname.startsWith('/api/')){

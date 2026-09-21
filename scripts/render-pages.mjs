@@ -3,12 +3,25 @@ import path from 'node:path';
 import {stories, questions as homeQuestions} from '../content/site.mjs';
 import {workshop, questions as webinarQuestions} from '../content/workshop.mjs';
 import {surveyQuestions} from '../content/webinar-survey.mjs';
+import {socialImages, socialPages} from '../content/social.mjs';
 import {icon,stepCards,surveyFields,preparationVideos} from './webinar-components.mjs';
 
 const root = 'wireframe/perspective-abstrakt';
 const origin = 'https://immobilien.hamann-kollegen.de';
 const escape = value => String(value).replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
-const icons = '<link rel="icon" type="image/png" sizes="32x32" href="/favicon.png"><link rel="icon" type="image/png" sizes="256x256" href="/apple-touch-icon.png"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><meta name="theme-color" content="#1c3553">';
+const icons = '<link rel="icon" type="image/x-icon" sizes="16x16 32x32 48x48" href="/favicon.ico"><link rel="icon" type="image/png" sizes="32x32" href="/favicon.png"><link rel="icon" type="image/png" sizes="96x96" href="/favicon-96.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><meta name="theme-color" content="#1c3553">';
+function socialMeta([imageKey, route, title, description]) {
+ const image = socialImages[imageKey];
+ const tags = {
+  'og:type':'website','og:locale':'de_DE','og:site_name':'Hamann & Kollegen Immobilien',
+  'og:title':title,'og:description':description,'og:url':origin+route,
+  'og:image':origin+image.path,'og:image:secure_url':origin+image.path,
+  'og:image:type':'image/png','og:image:width':'1200','og:image:height':'630','og:image:alt':image.alt,
+  'twitter:card':'summary_large_image','twitter:title':title,'twitter:description':description,
+  'twitter:image':origin+image.path,'twitter:image:alt':image.alt,
+ };
+ return Object.entries(tags).map(([key,value])=>`<meta ${key.startsWith('og:')?'property':'name'}="${key}" content="${escape(value)}">`).join('');
+}
 const org = {'@type':'Organization','@id':origin+'/#organization',name:'Hamann & Kollegen Immobilien GmbH',url:'https://www.hamann-kollegen.de/',logo:origin+'/assets/hamann-logo.svg'};
 const person = {'@type':'Person','@id':origin+'/#henrik-hamann',name:'Henrik Hamann',jobTitle:'Geschäftsführer',worksFor:{'@id':org['@id']},image:origin+'/assets/henrik-house.avif'};
 function structuredData(isWebinar, questions) {
@@ -16,7 +29,7 @@ function structuredData(isWebinar, questions) {
  const nodes = [org,person,{'@type':'WebSite','@id':origin+'/#website',url:origin+'/',name:'Hamann & Kollegen Immobilien',inLanguage:'de-DE',publisher:{'@id':org['@id']}},
   {'@type':'WebPage','@id':url+'#webpage',url,name:isWebinar?'Kostenloses Immobilien-Webinar am 30. September':'Immobilien als Kapitalanlage für Angestellte',inLanguage:'de-DE',isPartOf:{'@id':origin+'/#website'},about:{'@id':org['@id']}},
   {'@type':'FAQPage','@id':url+'#fragen',isPartOf:{'@id':url+'#webpage'},mainEntity:questions.map(([name,text])=>({'@type':'Question',name,acceptedAnswer:{'@type':'Answer',text}}))}];
- if(isWebinar) nodes.push({'@type':'EducationEvent','@id':url+'#event',name:workshop.name,description:'Kostenloses Live-Webinar für Angestellte ab 3.500 Euro netto: vermietete Immobilien systematisch bewerten, Finanzierung und steuerliche Effekte verstehen sowie Risiken prüfen.',url,startDate:workshop.start,endDate:workshop.end,eventStatus:'https://schema.org/EventScheduled',eventAttendanceMode:'https://schema.org/OnlineEventAttendanceMode',location:{'@type':'VirtualLocation',url},image:[origin+'/assets/henrik-house.avif'],inLanguage:'de-DE',isAccessibleForFree:true,organizer:{'@id':org['@id']},performer:{'@id':person['@id']},offers:{'@type':'Offer',url:url+'#anmelden',price:0,priceCurrency:'EUR',availability:'https://schema.org/InStock'}});
+ if(isWebinar) nodes.push({'@type':'EducationEvent','@id':url+'#event',name:workshop.name,description:'Kostenloses Live-Webinar für Angestellte ab 3.500 Euro netto: vermietete Immobilien systematisch bewerten, Finanzierung und steuerliche Effekte verstehen sowie Risiken prüfen.',url,startDate:workshop.start,endDate:workshop.end,eventStatus:'https://schema.org/EventScheduled',eventAttendanceMode:'https://schema.org/OnlineEventAttendanceMode',location:{'@type':'VirtualLocation',url},image:[origin+socialImages.webinar.path],inLanguage:'de-DE',isAccessibleForFree:true,organizer:{'@id':org['@id']},performer:{'@id':person['@id']},offers:{'@type':'Offer',url:url+'#anmelden',price:0,priceCurrency:'EUR',availability:'https://schema.org/InStock'}});
  return '<script type="application/ld+json">'+JSON.stringify({'@context':'https://schema.org','@graph':nodes}).replace(/</g,'\\u003c')+'</script>';
 }
 function testimonials(isWebinar = false) {
@@ -47,20 +60,22 @@ export async function renderPages() {
   await mkdir(path.dirname(path.join(root,target)),{recursive:true});
   await writeFile(path.join(root,target),html);
  }
- // Apply the real brand favicon to every funnel and CRM page as well.
- async function addIcons(directory) {
+ // Static metadata must be available to link-preview crawlers without JavaScript.
+ async function addMetadata(directory) {
   for(const entry of await readdir(directory,{withFileTypes:true})){
    const file=path.join(directory,entry.name);
-   if(entry.isDirectory()&&entry.name!=='assets')await addIcons(file);
+   if(entry.isDirectory()&&entry.name!=='assets')await addMetadata(file);
    else if(entry.isFile()&&entry.name.endsWith('.html')){
     let html=await readFile(file,'utf8');
     html=html.replace(/<link\b[^>]*\brel=["'](?:icon|shortcut icon|apple-touch-icon)["'][^>]*>/gi,'').replace(/<meta\b[^>]*name="theme-color"[^>]*>/gi,'');
-    html=html.replace('</head>',icons+'</head>');
+    const page=socialPages[path.relative(root,file).split(path.sep).join('/')];
+    if(page)html=html.replace(/<meta\b[^>]*\b(?:property|name)=["'](?:og|twitter):[^"']*["'][^>]*>/gi,'');
+    html=html.replace('</head>',icons+(page?socialMeta(page):'')+'</head>');
     await writeFile(file,html);
    }
   }
  }
- await addIcons(root);
+ await addMetadata(root);
  await writeFile(path.join(root,'workshop/termin.ics'),calendar());
  await writeFile(path.join(root,'robots.txt'),'User-agent: *\nAllow: /\nDisallow: /api/\nDisallow: /.netlify/functions/\n\nSitemap: '+origin+'/sitemap.xml\n');
  await writeFile(path.join(root,'sitemap.xml'),'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n  <url><loc>'+origin+'/</loc></url>\n  <url><loc>'+workshop.url+'</loc></url>\n</urlset>\n');

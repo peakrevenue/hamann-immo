@@ -120,7 +120,7 @@ Die Danke-Seite übernimmt bei einer normalen Website-Anmeldung den Vornamen aus
 
 ## Suchmaschinen und KI-Crawler
 
-Die öffentlichen Seiten `/` und `/workshop/` liefern Inhalte einschließlich Kundenstimmen und FAQ bereits als HTML aus. `robots.txt` erlaubt Crawlern den Zugriff auf öffentliche Inhalte; private API-Pfade sind ausgeschlossen. Die Sitemap enthält die beiden öffentlichen Seiten. Anfrage-, Quiz-, Termin-, Absage-, Danke- und Admin-Seiten bleiben `noindex`. Das gesamte Projekt verwendet das originale Marken-Favicon der Hauptwebsite (32 und 256 Pixel).
+Die öffentlichen Seiten `/` und `/workshop/` liefern Inhalte einschließlich Kundenstimmen und FAQ bereits als HTML aus. `robots.txt` erlaubt Crawlern den Zugriff auf öffentliche Inhalte; private API-Pfade sind ausgeschlossen. Die Sitemap enthält die beiden öffentlichen Seiten. Anfrage-, Quiz-, Termin-, Absage-, Danke- und Admin-Seiten bleiben `noindex`. Das gesamte Projekt verwendet das originale Marken-Favicon: PNG in 32 und 96 Pixeln, Apple-Touch-Icon in 180 Pixeln und eine ICO-Datei mit 16, 32 und 48 Pixeln.
 
 Beide öffentlichen Seiten haben eigene Titel, Beschreibungen, Canonicals und Open-Graph-Daten. JSON-LD beschreibt Organisation, Gastgeber, Website, Seite und sichtbare FAQ; beim Webinar zusätzlich ein kostenloses Online-Event mit korrekten Zeiten. Es werden keine erfundenen Bewertungen oder zusätzlichen Ergebnisversprechen ausgezeichnet. Interne Links verbinden Analysegespräch und Webinar.
 
@@ -129,6 +129,8 @@ Die technische Grundlage orientiert sich an [Googles Hinweisen zu AI-Funktionen]
 Quellen der Gestaltung und Copy: [Perspective Scaling Workshop](https://strategy.perspective.co/scaling-workshop/) für Reihenfolge und Aufbau, die bereitgestellten kommentierten Screenshots und [bisherige Webinar-Seite](https://hamann-kollegen-webinar.lovable.app/) für Inhalte, [Hamann & Kollegen](https://www.hamann-kollegen.de/) für Marke und Kundenstimmen sowie [Tobias Bräunigs Webinar-Danke-Seite](https://tobias-braeunig.de/webinar-danke/) für Bestätigung, Kalender und Teilnahmevorbereitung. Fremde Testimonials und Kennzahlen wurden nicht übernommen.
 
 Bearbeitung: `templates/home.html`, `templates/workshop.html`, `templates/workshop-danke.html`; wiederverwendete Inhalte in `content/site.mjs` und `content/workshop.mjs`. `npm run build` erzeugt die veröffentlichten HTML-Dateien, JSON-LD, Sitemap und Kalenderdatei über `scripts/render-pages.mjs`. Öffentliches HTML nicht direkt bearbeiten, wenn dafür eine Vorlage existiert.
+
+Social-Vorschauen werden zentral über `content/social.mjs` den Funnel-Seiten zugeordnet. Alle Tags für Open Graph und Twitter stehen bereits im ausgelieferten HTML; Danke- und Umfrageseiten behalten `noindex`. `scripts/render-social-assets.mjs` erzeugt beim Build zwei PNG-Karten in 1200 × 630 Pixeln mit Original-Logo und lokalen Markenschriften sowie die Icon-Formate. Die Karten enthalten keine Teilnehmerdaten. Bildpfade sind versioniert: Bei späteren Motivänderungen den Dateinamen in `content/social.mjs` erhöhen. Die Bildmitte enthält Logo und Titel auch für quadratische Ausschnitte.
 
 Prüfungen für das Webinar: Validierung, nur der vorgesehene Hook, UTM-Weitergabe, signierte Bestätigung, doppelte Anmeldung, Ausfälle und Wiederholungen, fehlende Konfiguration, Speicherausfälle, Spam-Begrenzung und abgelaufener Termin. Browserprüfung mit simuliertem Hook und Daten nur im Arbeitsspeicher: ungültige Nummer → Korrektur → erfolgreiche Anmeldung → personalisierte Danke-Seite.
 
