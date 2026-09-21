@@ -1,7 +1,7 @@
 /* Hamann & Kollegen light theme. Source: hamann-kollegen.de, 17 Sep 2026.
    Original brand colors: Navy #1c3553, Gold #d0a065.
    Copy and Perspective section order intentionally retained. */
-:root{--paper:#fff;--ink:#1c3553;--muted:#607080;--blue:#1c3553;--navy:#1c3553;--gold:#d0a065;--gold-ink:#886131;--cream:#f6f5f3;--line:#e3e6e8}
+:root{--brand-width:230px;--paper:#fff;--ink:#1c3553;--muted:#607080;--blue:#1c3553;--navy:#1c3553;--gold:#d0a065;--gold-ink:#886131;--cream:#f6f5f3;--line:#e3e6e8}
 body{background:#fff;color:var(--navy);font-family:'Figtree',Arial,sans-serif}
 h1{font-family:'Inter',Arial,sans-serif;font-weight:600;letter-spacing:-1.8px;line-height:1.17}
 h2,h3{font-family:'Outfit','Inter',Arial,sans-serif;font-weight:500;letter-spacing:-.9px}
@@ -9,7 +9,7 @@ h3{letter-spacing:-.35px}
 p{color:#596878}.lead{font-weight:400}.micro{color:#74808b}.label{color:var(--gold-ink);letter-spacing:1.8px}
 .review{background:var(--cream);color:#6a7681;border-color:#e9e7e3}
 .hero{background:#fff;padding-top:42px}.hero h1{margin-top:28px;max-width:960px}.hero .lead{max-width:850px}.hero .audience{color:var(--gold-ink);font-size:13px;letter-spacing:1.2px;text-transform:uppercase}
-.brand{display:block;width:295px;height:auto;margin:0 auto 38px;padding:0;background:none;border-radius:0;box-shadow:none;line-height:1}.brand img{display:block;width:100%;height:auto}
+.brand{display:block;width:var(--brand-width);height:auto;margin:0 auto 38px;padding:0;background:none;border-radius:0;box-shadow:none;line-height:1}.brand img{display:block;width:100%;height:auto}
 .badge{border-color:#e4d3bb;background:#faf6f0;color:var(--navy);font-size:12px}.badge span{color:var(--gold-ink);border-color:#e4d3bb}
 .button{font-family:'Figtree',Arial,sans-serif;background:var(--gold);color:#1c3553;border:1px solid #c79559;border-radius:10px;font-size:20px;font-weight:700;gap:24px;box-shadow:0 4px 12px #1c355308;transition:background .15s,transform .15s,box-shadow .15s}
 .button:after{content:'›';font-size:28px;font-weight:400;line-height:.7}.button:hover{background:#dbae78;box-shadow:0 6px 18px #1c355312;transform:translateY(-2px)}a:focus-visible,button:focus-visible,summary:focus-visible{outline-color:#886131}
@@ -23,7 +23,7 @@ p{color:#596878}.lead{font-weight:400}.micro{color:#74808b}.label{color:var(--go
 .book{background:var(--navy);color:#fff;box-shadow:0 20px 30px #1c355322}.book span{color:#c5ced8}.ticket{background:var(--gold);color:var(--navy);box-shadow:0 20px 30px #1c355322}.roadmap{border:1px solid #ebe4da;color:#8b6b45;box-shadow:0 20px 30px #1c355319}.roadmap b{color:var(--navy)}.benefits article{border-color:var(--line)}.benefit-icon{background:var(--navy);color:#e4c79f}.blue-icon{background:var(--gold);color:var(--navy)}.light{background:#fff;border-color:#dfd6c8}.light span{color:#886131;border-color:#dfd6c8}
 .portrait{background:linear-gradient(135deg,#304963,#1c3553)}.portrait>span{color:#d3dde5}.silhouette{background:linear-gradient(#6e8194,#405a75)}.silhouette:before{background:#6e8194}.signature{color:#98713f}.host small{color:#697582}details{border-color:var(--line)}summary:after{color:#a87c43}footer{border-color:var(--line);background:var(--cream);color:#6d7a87}footer p{color:#6d7a87}
 dialog{color:var(--navy);font-family:'Figtree',Arial,sans-serif}dialog::backdrop{background:#10233999}.close{color:var(--navy)}.form-placeholder span{border-color:#d1d8df;color:#6f7c88}.form-placeholder b{background:var(--gold);color:var(--navy)}
-@media(max-width:700px){.hero{padding-top:32px}.brand{width:250px;margin-bottom:30px}.hero .audience{font-size:11px;letter-spacing:1px}h1{font-size:34px;letter-spacing:-1.2px}h2{letter-spacing:-.8px}.button{font-size:18px;gap:18px;padding:15px 22px}.blue{padding:45px 22px}.case-left{border-color:var(--line)}}
+@media(max-width:700px){:root{--brand-width:180px}.hero{padding-top:32px}.brand{margin-bottom:30px}.hero .audience{font-size:11px;letter-spacing:1px}h1{font-size:34px;letter-spacing:-1.2px}h2{letter-spacing:-.8px}.button{font-size:18px;gap:18px;padding:15px 22px}.blue{padding:45px 22px}.case-left{border-color:var(--line)}}
 @media(prefers-reduced-motion:reduce){.button{transition:none}}
 
 /* Supplied introduction video: preserve its native aspect ratio. */
@@ -63,7 +63,7 @@ dialog{color:var(--navy);font-family:'Figtree',Arial,sans-serif}dialog::backdrop
 .hero-headline>span{display:block}
 @media(min-width:1000px){.hero-headline>span{white-space:nowrap}}
 @media(min-width:701px) and (max-width:999px){.hero .hero-headline{font-size:clamp(27px,4vw,39px);letter-spacing:-1px}}
-@media(max-width:700px){.hero .hero-headline{font-size:32px;line-height:1.2;letter-spacing:-1px}.hero-headline>span{display:inline}.hero-headline>span:first-child{display:block;margin-bottom:14px}.hero .badge{font-size:10px;row-gap:6px;max-width:100%}}
+@media(max-width:700px){.hero .hero-headline{font-size:clamp(21px,6.5vw,34px);line-height:1.2;letter-spacing:-.65px}.hero .hero-headline:has(>span){font-size:clamp(14px,4.25vw,26px)}.hero .lead{font-size:18px}.hero-headline>span{display:inline}.hero-headline>span:first-child{display:block;font-size:clamp(21px,6.5vw,34px);line-height:1.15;letter-spacing:-.8px;margin-bottom:10px}.hero .badge{font-size:10px;row-gap:6px;max-width:100%}}
 
 /* Henrik: original transparent artwork and white signature on brand navy. */
 .host-section{background:var(--navy);color:#fff;margin-top:70px}
