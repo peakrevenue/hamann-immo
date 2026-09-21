@@ -6,7 +6,7 @@ const context=prepareSurveyContext(mailing).catch(()=>null);
 document.querySelectorAll('.survey-link').forEach(link=>link.addEventListener('click',async event=>{event.preventDefault();await context;location.assign(link.href);}));
 function greet(firstName){document.getElementById('thanks-title').textContent=firstName?`${firstName}, du bist dabei.`:'Du bist dabei.';}
 (async()=>{
- if(new URLSearchParams(location.search).get('vorschau')==='1'){document.getElementById('thanks-preview').hidden=false;return;}
+ if(new URLSearchParams(location.search).get('vorschau')==='1'){return;}
  // Klaviyo/Zapier register mailing visitors externally. This page only prepares
  // their survey and must never create or resend a webinar registration.
  if(mailing.email){greet(mailing.firstName);return;}
