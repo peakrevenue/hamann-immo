@@ -1,7 +1,11 @@
 import { randomBytes, randomUUID, createHmac, timingSafeEqual, scryptSync } from 'node:crypto';
 import { validateLead,validateContact,roles,experiences,incomes,qualifies } from './validation.mjs';
 import {attribution,queueEvent,flushOutbox} from './webhook.mjs';
-const statuses = ['incomplete','disqualified','new','contacted','appointment','won','lost','archived'];
+import {validateWebinar} from './webinar.mjs';
+import {workshop} from '../content/workshop.mjs';
+import {surveyAnswerLabels} from '../content/webinar-survey.mjs';
+import {contactEmail,validateSurvey,surveyRevision} from './webinar-survey.mjs';
+const statuses = ['incomplete','disqualified','new','webinar','contacted','appointment','won','lost','archived'];
 const noCache = {'Cache-Control':'no-store','Content-Type':'application/json; charset=utf-8','X-Content-Type-Options':'nosniff'};
 export function passwordHash(password) {const salt = randomBytes(16).toString('hex');return salt+':'+scryptSync(password,salt,64).toString('hex');}
 function same(a,b) {const x=Buffer.from(a||''),y=Buffer.from(b||'');return x.length===y.length&&timingSafeEqual(x,y);}
@@ -41,6 +45,74 @@ export function createApi({store, config, fetcher=fetch}) {
       let data={};
       if(method!=='GET') {const raw=await req.text();if(raw.length>16000)return json({error:'Anfrage zu groß.'},413);try{data=JSON.parse(raw);}catch{return json({error:'Ungültige Anfrage.'},400);}if(!data||Array.isArray(data)||typeof data!=='object')return json({error:'Ungültige Anfrage.'},400);}
       const ip=context.ip||'unknown';
+      if(path==='/webinar/register'&&method==='POST') {
+        if(data.website)return json({error:'Bitte versuche es erneut.'},400);
+        if(Date.now()>Date.parse(workshop.end))return json({error:'Dieses Webinar ist bereits beendet.'},410);
+        if(!config.webinarWebhookUrl)return json({error:'Die Webinar-Anmeldung wird gerade vorbereitet. Bitte versuche es später erneut.'},503);
+        if(!await rate('webinar:'+ip,12,3600000))return json({error:'Zu viele Anfragen. Bitte versuche es später erneut.'},429);
+        const checked=validateWebinar(data);if(checked.error)return json(checked,422);
+        const digest=createHmac('sha256',config.secret).update('webinar:'+workshop.id+':'+checked.value.email).digest('hex').slice(0,32);
+        const id=[digest.slice(0,8),digest.slice(8,12),digest.slice(12,16),digest.slice(16,20),digest.slice(20)].join('-');
+        const previous=await store.get('leads/'+id),now=new Date().toISOString();
+        const lead={...previous,id,...checked.value,name:checked.value.firstName+' '+checked.value.lastName,source:'webinar',webinarId:workshop.id,
+          createdAt:previous?.createdAt||now,updatedAt:now,consentedAt:now,consentVersion:'webinar-submit-2026-09-21',
+          status:previous?.status||'webinar',stage:'webinar_registered',qualification:'not_applicable',notes:previous?.notes||'',
+          experiment:'webinar',variant:null,attribution:attribution({...previous?.attribution,...data.attribution})};
+        await store.set('leads/'+id,lead);
+        await queueEvent(store,config,lead,'webinar_registered',fetcher);
+        return json({ok:true,next:'/workshop/danke/'},200,{'Set-Cookie':cookie('hk_webinar',pack({kind:'webinar',id,exp:Date.now()+7*86400000}),req,7*86400)});
+      }
+      if(path==='/webinar/registration'&&method==='GET') {
+        const token=unpack(readCookie(req,'hk_webinar'));
+        if(token?.kind!=='webinar')return json({error:'Bitte melde dich zuerst zum Webinar an.'},401);
+        const lead=await store.get('leads/'+token.id);
+        if(!lead||lead.webinarId!==workshop.id)return json({error:'Anmeldung nicht gefunden.'},404);
+        const jobs=await store.list('outbox/'+lead.id+':webinar_registered:');
+        const pending=jobs.some(job=>!job.deliveredAt);
+        return json({registered:true,firstName:lead.firstName,deliveryPending:pending});
+      }
+      if(path==='/webinar/survey-context'&&['GET','POST'].includes(method)) {
+        const token=unpack(readCookie(req,'hk_webinar_context'));
+        let saved=token?.kind==='webinar-context'?await store.get('webinar-contexts/'+token.id):null;
+        if(saved?.expires<=Date.now())saved=null;
+        const registration=unpack(readCookie(req,'hk_webinar'));
+        const lead=registration?.kind==='webinar'?await store.get('leads/'+registration.id):null;
+        const own=lead?.webinarId===workshop.id?lead:null;
+        if(method==='GET')return json({email:saved?.email||own?.email||'',firstName:saved?.firstName||own?.firstName||''});
+        if(!await rate('survey-context:'+ip,50,3600000))return json({error:'Bitte versuche es später erneut.'},429);
+        if(data.email&&!contactEmail(data.email))return json({error:'Bitte prüfe deine E-Mail-Adresse.'},422);
+        const email=contactEmail(data.email)||saved?.email||own?.email||'';
+        const firstName=typeof data.firstName==='string'&&!/[<>\r\n]/.test(data.firstName)?data.firstName.trim().slice(0,80):'';
+        const value={id:saved?.id||randomUUID(),email,firstName:firstName||(saved?.email===email?saved.firstName:'')||(own?.email===email?own.firstName:'')||'',expires:Date.now()+7*86400000};
+        await store.set('webinar-contexts/'+value.id,value);
+        return json({email:value.email,firstName:value.firstName},200,{'Set-Cookie':cookie('hk_webinar_context',pack({kind:'webinar-context',id:value.id,exp:value.expires}),req,7*86400)});
+      }
+      if(path==='/webinar/survey'&&method==='POST') {
+        if(data.website)return json({error:'Bitte versuche es erneut.'},400);
+        if(!await rate('survey:'+ip,20,3600000))return json({error:'Zu viele Anfragen. Bitte versuche es später erneut.'},429);
+        const token=unpack(readCookie(req,'hk_webinar_context'));
+        const saved=token?.kind==='webinar-context'?await store.get('webinar-contexts/'+token.id):null;
+        if(!saved||saved.expires<=Date.now())return json({error:'Bitte lade die Umfrage neu und erlaube notwendige Cookies.'},400);
+        const checked=validateSurvey(data);if(checked.error)return json(checked,422);
+        const {email,...answers}=checked.value;
+        const registration=unpack(readCookie(req,'hk_webinar'));
+        const lead=registration?.kind==='webinar'?await store.get('leads/'+registration.id):null;
+        const own=lead?.webinarId===workshop.id&&lead.email===email?lead:null;
+        const id=saved.id,now=new Date().toISOString(),prior=await store.get('surveys/'+id);
+        const survey={id,email,answers,firstName:own?.firstName||(saved.email===email?saved.firstName:'')||'',registrationId:own?.id||null,
+          createdAt:prior?.createdAt||now,updatedAt:now,revision:surveyRevision(checked.value),attribution:attribution({...own?.attribution,...data.attribution})};
+        await store.set('surveys/'+id,survey);
+        await queueEvent(store,config,survey,'webinar_survey_completed',fetcher);
+        await store.set('webinar-contexts/'+id,{...saved,email,firstName:survey.firstName});
+        return json({ok:true,next:'/workshop/umfrage/danke/'},200,{'Set-Cookie':cookie('hk_webinar_survey',pack({kind:'webinar-survey',id,exp:Date.now()+7*86400000}),req,7*86400)});
+      }
+      if(path==='/webinar/survey-confirmation'&&method==='GET') {
+        const token=unpack(readCookie(req,'hk_webinar_survey'));
+        if(token?.kind!=='webinar-survey')return json({error:'Noch keine Umfrage übermittelt.'},401);
+        const survey=await store.get('surveys/'+token.id);
+        if(!survey)return json({error:'Umfrage nicht gefunden.'},404);
+        return json({completed:true,firstName:survey.firstName});
+      }
       if(path==='/experiment'&&method==='GET') {
         if(url.searchParams.has('preview')) {
           if(!await auth(req))return json({error:'Die Testvorschau ist nur nach Admin-Login verfügbar.'},401);
@@ -131,7 +203,8 @@ export function createApi({store, config, fetcher=fetch}) {
       if(path==='/admin/logout'&&method==='POST') {await store.delete('sessions/'+session.id);return json({ok:true},200,{'Set-Cookie':cookie('hk_admin','',req,0)});}
       if(path==='/admin/me'&&method==='GET')return json({email:config.adminEmail,local:!!config.local});
       if(path==='/admin/webhooks/retry'&&method==='POST'){await flushOutbox(store,config,fetcher);return json({ok:true});}
-      if(path==='/admin/webhooks'&&method==='GET'){const jobs=await store.list('outbox/');return json({configured:!!config.webhookUrl&&!config.webhookDisabled,quizConfigured:!!config.quizWebhookUrl&&!config.webhookDisabled,pending:jobs.filter(j=>!j.deliveredAt).length,delivered:jobs.filter(j=>j.deliveredAt).length});}
+      if(path==='/admin/webhooks'&&method==='GET'){const jobs=await store.list('outbox/');return json({configured:!!config.webhookUrl&&!config.webhookDisabled,quizConfigured:!!config.quizWebhookUrl&&!config.webhookDisabled,webinarConfigured:!!config.webinarWebhookUrl&&!config.webhookDisabled,surveyConfigured:!!config.webinarSurveyWebhookUrl&&!config.webhookDisabled,pending:jobs.filter(j=>!j.deliveredAt).length,delivered:jobs.filter(j=>j.deliveredAt).length});}
+      if(path==='/admin/surveys'&&method==='GET')return json({surveys:(await store.list('surveys/')).sort((a,b)=>b.updatedAt.localeCompare(a.updatedAt)).map(s=>({...s,answerLabels:surveyAnswerLabels(s.answers)}))});
       if(path==='/admin/leads'&&method==='GET')return json({leads:(await store.list('leads/')).sort((a,b)=>b.createdAt.localeCompare(a.createdAt))});
       if(path.startsWith('/admin/leads/')&&method==='PATCH') {
         const id=path.split('/').pop();if(!/^[a-f0-9-]{36}$/.test(id))return json({error:'Ungültige ID.'},400);

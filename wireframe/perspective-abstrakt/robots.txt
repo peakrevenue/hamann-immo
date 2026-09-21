@@ -1,5 +1,6 @@
 User-agent: *
 Allow: /
 Disallow: /api/
+Disallow: /.netlify/functions/
 
 Sitemap: https://immobilien.hamann-kollegen.de/sitemap.xml

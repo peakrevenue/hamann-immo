@@ -6,3 +6,5 @@
 .test-preview-notice{background:#1c3553;color:#fff;font-size:12px;text-align:center;padding:12px 18px;line-height:1.5}
 @media(max-width:400px){.hero-headline{overflow-wrap:anywhere}.bundle .book{left:3%}}
 .brand-benefit img[src*="icon-"]{transform:scale(1.15)}
+
+.skip-link{position:absolute;left:16px;top:-90px;z-index:5;padding:12px;background:#fff;color:var(--navy)}.skip-link:focus{top:12px}

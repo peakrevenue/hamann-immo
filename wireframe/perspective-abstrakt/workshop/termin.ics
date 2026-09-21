@@ -1,0 +1,24 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Hamann und Kollegen//Immobilien-Webinar//DE
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:immobilien-workshop-2026-09-30@immobilien.hamann-kollegen.de
+DTSTAMP:20260921T000000Z
+DTSTART:20260930T170000Z
+DTEND:20260930T183000Z
+SUMMARY:Deine erste vermietete Immobilie: das 4-Punkte-Prüfsystem
+DESCRIPTION:Live-Webinar mit Henrik Hamann. Den persönlichen Zugangslink f
+ indest du in deiner E-Mail. Informationen: https://immobilien.hamann-kolle
+ gen.de/workshop/
+LOCATION:Online\, Zugangslink per E-Mail
+URL:https://immobilien.hamann-kollegen.de/workshop/
+STATUS:CONFIRMED
+BEGIN:VALARM
+TRIGGER:-PT15M
+ACTION:DISPLAY
+DESCRIPTION:Dein Immobilien-Webinar beginnt in 15 Minuten.
+END:VALARM
+END:VEVENT
+END:VCALENDAR

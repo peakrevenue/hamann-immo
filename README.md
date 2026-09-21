@@ -23,9 +23,12 @@ npm run dev
 
 `netlify.toml` baut das Quiz und veröffentlicht `wireframe/perspective-abstrakt`. Die API läuft als Netlify Function unter `/api/*`. Die Datenspeicherung verwendet einen privaten, deployübergreifenden Netlify-Blobs-Store `hamann-crm` mit starker Lesekonsistenz. Produktion benötigt keine externe Datenbank.
 
-Vor dem Deployment **vier Umgebungsvariablen** für dieses Netlify-Projekt setzen:
+Vor dem Deployment die Umgebungsvariablen für dieses Netlify-Projekt setzen:
 
 - `HAMANN_ZAPIER_WEBHOOK_URL` (der Zapier Catch-Hook; bleibt ausschließlich serverseitig)
+- `HAMANN_ZAPIER_QUIZ_WEBHOOK_URL` (separater Hook für Quiz-Abschlüsse)
+- `HAMANN_ZAPIER_WEBINAR_WEBHOOK_URL` (separater Hook für Webinar-Anmeldungen)
+- `HAMANN_ZAPIER_WEBINAR_SURVEY_WEBHOOK_URL` (separater Hook für Umfrage-Antworten)
 - `HAMANN_ADMIN_EMAIL`
 - `HAMANN_ADMIN_PASSWORD_HASH` (scrypt-Hash, kein Klartextpasswort)
 - `HAMANN_SESSION_SECRET` (mindestens 32 Zeichen; erzeugt mit kryptografischer Zufallsquelle)
@@ -100,3 +103,50 @@ Die Kontakt-Ereignisse gehen an `HAMANN_ZAPIER_WEBHOOK_URL`, Quiz-Abschlüsse au
 `role`, `experience`, `income`, `qualification` und `stage` enthalten deutsche Werte. Die ausgewählten Antworten entsprechen exakt den Optionen im Formular. `antworten` enthält alle Fragen, ausgewählte Antworten und mögliche Antworten. Für stabile Filter stehen zusätzlich `role_code`, `experience_code`, `income_code`, `qualification_code` bereit. Bestehende Zapier-Filter auf englische Antwortwerte auf diese Code-Felder umstellen.
 
 Das Kontaktformular verwendet einen Datenschutzhinweis unter dem Button ohne Checkbox. `consented_at` dokumentiert den aktiven Versand nach diesem Hinweis, nicht eine separate Checkbox; Version `contact-submit-2026-09-17`.
+
+## Immobilien-Webinar
+
+`/workshop/` → Anmelde-Pop-up → `/api/webinar/register` → private Speicherung und eigene Zapier-Outbox → `/workshop/danke/`.
+
+Termin: **30. September 2026, 19:00–20:30 Uhr, Europe/Berlin**. Die zentralen Veranstaltungsdaten liegen in `content/workshop.mjs`. Bei Terminänderungen auch die sichtbaren Texte in `templates/workshop.html` und `templates/workshop-danke.html` aktualisieren und neu bauen.
+
+Das Formular benötigt Vorname, Nachname, E-Mail und eine gültige Telefonnummer. Es ist unabhängig vom Analysegespräch und dessen Qualifizierungsquiz. Webinar-Kontakte erscheinen im CRM als „Webinar angemeldet“. Die serverseitige Konfiguration lautet lokal `webinarWebhookUrl` in `.local/config.json`, in Netlify `HAMANN_ZAPIER_WEBINAR_WEBHOOK_URL`. Der vom Auftraggeber gelieferte Anmelde-Hook ist in Netlify als geheime Variable ausschließlich für Functions im Produktionskontext hinterlegt.
+
+Der Hook erhält `event = webinar_registered`, `event_id`, `lead_id`, `first_name`, `last_name`, `vorname`, `nachname`, vollständigen `name`, `email`, normalisierte `phone`, `country`, Veranstaltungs-ID/-Titel/-Beginn/-Ende/-Zeitzone, Zeitstempel und alle bereinigten UTM-Parameter (flach und unter `attribution`). Gleiche E-Mail-Adressen werden für dieselbe Veranstaltung demselben Kontakt zugeordnet. Ein unverändert erneut abgesendetes Formular löst nach erfolgreicher Zustellung kein zweites Ereignis aus. Zapier sollte dennoch nach `event_id` deduplizieren, da Netzwerk-Wiederholungen technisch mehrfache Zustellungen auslösen können.
+
+Die Danke-Seite übernimmt bei einer normalen Website-Anmeldung den Vornamen aus einem signierten HttpOnly-Cookie. Klaviyo registriert Mailing-Empfänger bereits extern über Zapier und führt ebenfalls direkt auf diese Seite. Die Danke-Seite löst selbst keine Anmeldung aus. Der technische Zustellstatus erscheint nur im Admin. `?vorschau=1` zeigt eine ausdrücklich markierte Designvorschau ohne Speicherung oder Versand. Kalenderexport für Apple (`/workshop/termin.ics`), Google- und Outlook-Kalenderlinks enthalten 19:00 Uhr deutscher Zeit sowie die Dauer von 90 Minuten.
+
+**Zugangsmail:** Der Website-Code übermittelt die Anmeldung. Versand, tatsächlicher Webinar-Zugangslink und Erinnerungen müssen im empfangenden Zap eingerichtet sein. Der hier durchgeführte Test hat den Empfänger simuliert und keine Webinar-Testkontakte an den echten Hook geschickt. Die lokale Browser-Vorschau läuft mit `HAMANN_DISABLE_WEBHOOK=1`.
+
+## Suchmaschinen und KI-Crawler
+
+Die öffentlichen Seiten `/` und `/workshop/` liefern Inhalte einschließlich Kundenstimmen und FAQ bereits als HTML aus. `robots.txt` erlaubt Crawlern den Zugriff auf öffentliche Inhalte; private API-Pfade sind ausgeschlossen. Die Sitemap enthält die beiden öffentlichen Seiten. Anfrage-, Quiz-, Termin-, Absage-, Danke- und Admin-Seiten bleiben `noindex`. Das gesamte Projekt verwendet das originale Marken-Favicon der Hauptwebsite (32 und 256 Pixel).
+
+Beide öffentlichen Seiten haben eigene Titel, Beschreibungen, Canonicals und Open-Graph-Daten. JSON-LD beschreibt Organisation, Gastgeber, Website, Seite und sichtbare FAQ; beim Webinar zusätzlich ein kostenloses Online-Event mit korrekten Zeiten. Es werden keine erfundenen Bewertungen oder zusätzlichen Ergebnisversprechen ausgezeichnet. Interne Links verbinden Analysegespräch und Webinar.
+
+Die technische Grundlage orientiert sich an [Googles Hinweisen zu AI-Funktionen](https://developers.google.com/search/docs/appearance/ai-features) und der [OpenAI-Bot-Dokumentation](https://developers.openai.com/api/docs/bots). Öffentlich erreichbare, indexierbare HTML-Inhalte sind dafür entscheidend; spezielle AI-Dateien oder ein bestimmtes Ranking werden nicht vorausgesetzt oder versprochen. Hosting-/Firewall-Einstellungen und tatsächliche Indexierung sind zusätzlich auf der Live-Domain zu prüfen.
+
+Quellen der Gestaltung und Copy: [Perspective Scaling Workshop](https://strategy.perspective.co/scaling-workshop/) für Reihenfolge und Aufbau, die bereitgestellten kommentierten Screenshots und [bisherige Webinar-Seite](https://hamann-kollegen-webinar.lovable.app/) für Inhalte, [Hamann & Kollegen](https://www.hamann-kollegen.de/) für Marke und Kundenstimmen sowie [Tobias Bräunigs Webinar-Danke-Seite](https://tobias-braeunig.de/webinar-danke/) für Bestätigung, Kalender und Teilnahmevorbereitung. Fremde Testimonials und Kennzahlen wurden nicht übernommen.
+
+Bearbeitung: `templates/home.html`, `templates/workshop.html`, `templates/workshop-danke.html`; wiederverwendete Inhalte in `content/site.mjs` und `content/workshop.mjs`. `npm run build` erzeugt die veröffentlichten HTML-Dateien, JSON-LD, Sitemap und Kalenderdatei über `scripts/render-pages.mjs`. Öffentliches HTML nicht direkt bearbeiten, wenn dafür eine Vorlage existiert.
+
+Prüfungen für das Webinar: Validierung, nur der vorgesehene Hook, UTM-Weitergabe, signierte Bestätigung, doppelte Anmeldung, Ausfälle und Wiederholungen, fehlende Konfiguration, Speicherausfälle, Spam-Begrenzung und abgelaufener Termin. Browserprüfung mit simuliertem Hook und Daten nur im Arbeitsspeicher: ungültige Nummer → Korrektur → erfolgreiche Anmeldung → personalisierte Danke-Seite.
+
+
+## Webinar-Umfrage und Mailing-Einstieg
+
+`/workshop/danke/` bietet drei Schritte: Kalender speichern, Umfrage ausfüllen, Videos ansehen. Desktop zeigt drei Karten nebeneinander, mobile Ansichten stapeln sie. Die direkte Danke-Seite ist für bereits über Klaviyo/Zapier angemeldete Personen vorgesehen; sie erstellt **keine** weitere Webinar-Anmeldung.
+
+Klaviyo-Ziel: `https://immobilien.hamann-kollegen.de/workshop/danke/`. Optional `email` und `first_name` als URL-kodierte Parameter mitgeben. Beispielstruktur: `/workshop/danke/?email=URL_KODIERTE_ADRESSE&first_name=URL_KODIERTER_VORNAME&utm_source=klaviyo`. Diese Platzhalter sind keine Klaviyo-Template-Syntax. Die tatsächlich in Klaviyo verfügbaren Profilvariablen im Mailing verwenden. Kontaktdaten werden nach dem Einlesen aus der sichtbaren URL entfernt, die Seite sendet keinen Referrer und lädt keine externen Medien vor einer aktiven Wiedergabe. Die Adresse dient ausschließlich zur Vorbelegung; aus einer Adresse allein werden keine vorhandenen Kontaktdaten gelesen.
+
+`/workshop/umfrage/` fragt Situation, berufliche Rolle, Monatsnetto, Investment-Ziele (Mehrfachauswahl) und eine freiwillige Webinar-Frage ab. Im letzten Schritt wird nur die E-Mail bestätigt. Die Adresse stammt aus der Website-Anmeldung, aus dem Mailing-Link oder wird manuell eingegeben. Ein signiertes HttpOnly-Cookie ordnet einen kurzlebigen, privaten Vorbelegungsdatensatz zu. Die Umfrage ist freiwillig und führt zu keiner zusätzlichen Webinar-Anmeldung oder Qualifizierung.
+
+`POST /api/webinar/survey` speichert Antworten privat unter `surveys/` und legt das Ereignis `webinar_survey_completed` in die Outbox. Es enthält deutsche Antworttexte, stabile Antwortcodes, `email`, den bekannten Vornamen, `registration_id` (nur bei passender Website-Anmeldung), UTM-Parameter und eine deduplizierbare `event_id`. Wiederholungen innerhalb derselben Umfragesitzung behalten dieselbe ID; geänderte Antworten erzeugen eine neue Revision. Bei Zapier nach `event_id` deduplizieren.
+
+Der eigene Empfänger wird als `HAMANN_ZAPIER_WEBINAR_SURVEY_WEBHOOK_URL` konfiguriert (lokal `webinarSurveyWebhookUrl`). Solange dieser Hook fehlt, bleiben Antworten und Versandaufträge gespeichert. Sie werden **nicht** ersatzweise an den Anmelde- oder Kontakt-Hook gesendet. Im Admin gibt es einen eigenen Bereich „Webinar-Umfragen“ und den Versandstatus. Nach Einrichten des Hooks können ausstehende Antworten über den Wiederholungsbutton versendet werden.
+
+`/workshop/umfrage/danke/` bestätigt eine gespeicherte Umfrage per signiertem Cookie, zeigt dieselben Vorbereitungsvideos und vorhandene Kundenstimmen. Ohne Übermittlung erscheint keine erfundene Erfolgsbestätigung. `?vorschau=1` ist eine beschriftete Designvorschau.
+
+Videos und Social-Links stehen in `content/webinar-videos.mjs`. Verifizierte Quellen: [offizieller YouTube-Kanal](https://www.youtube.com/@hamannkollegen/videos), [ausführliches Immobiliengespräch](https://www.youtube.com/watch?v=Z54_o3WYvUU), [Eigenkapital und Finanzierung](https://www.youtube.com/watch?v=UtI54YtnX6w), [Instagram](https://www.instagram.com/hamann_kollegen_immobilien/). Auswahl nach Themenpassung, keine Behauptung über interne Performance-Zahlen. YouTube wird erst nach Klick als `youtube-nocookie.com`-Player geladen; direkte Videolinks bleiben verfügbar.
+
+Neue Vorlagen: `templates/workshop-umfrage.html`, `templates/workshop-umfrage-danke.html`. Gemeinsame Karten, Kalender-Icons und Videoelemente: `scripts/webinar-components.mjs`. Gestaltung: `wireframe/perspective-abstrakt/workshop/followup.css`. Alle Danke-/Umfrage-Seiten bleiben `noindex` und außerhalb der Sitemap.
