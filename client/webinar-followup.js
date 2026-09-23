@@ -1,12 +1,13 @@
 import {request} from './attribution.js';
 import {workshop} from '../content/workshop.mjs';
 // A supplied email is only prefill data. It never authorizes contact retrieval.
-export function takeMailingContext() {
-  const url=new URL(location.href),params=url.searchParams;
+export function takeMailingContext(scope=globalThis) {
+  if(scope.__hkWebinarMailing){const saved=scope.__hkWebinarMailing;delete scope.__hkWebinarMailing;return saved;}
+  const url=new URL(scope.location.href),params=url.searchParams;
   const email=params.get('email')||params.get('email_address')||'';
   const firstName=params.get('first_name')||params.get('firstname')||params.get('vorname')||'';
   const keys=['email','email_address','first_name','firstname','vorname'];
-  if(keys.some(k=>params.has(k))){keys.forEach(k=>params.delete(k));history.replaceState(null,'',url.pathname+(params.size?'?'+params.toString():'')+url.hash);}
+  if(keys.some(k=>params.has(k))){keys.forEach(k=>params.delete(k));scope.history.replaceState(null,'',url.pathname+(params.size?'?'+params.toString():'')+url.hash);}
   return {email,firstName};
 }
 export async function prepareSurveyContext(contact) {

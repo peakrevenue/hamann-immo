@@ -8,6 +8,10 @@ import {icon,stepCards,surveyFields,preparationVideos} from './webinar-component
 
 const root = 'wireframe/perspective-abstrakt';
 const origin = 'https://immobilien.hamann-kollegen.de';
+const trackingOrigin = 'https://vt.hamann-kollegen.de';
+const trackingSiteId = 'VT-C5735E4A-66884';
+const trackingScript = file => `<script async src="${trackingOrigin}/${file}.js?site-id=${trackingSiteId}"></script>`;
+const mailingPages = new Set(['workshop-danke.html','workshop-umfrage.html','workshop-umfrage-danke.html']);
 const escape = value => String(value).replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
 const icons = '<link rel="icon" type="image/x-icon" sizes="16x16 32x32 48x48" href="/favicon.ico"><link rel="icon" type="image/png" sizes="32x32" href="/favicon.png"><link rel="icon" type="image/png" sizes="96x96" href="/favicon-96.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><meta name="theme-color" content="#1c3553">';
 function socialMeta([imageKey, route, title, description]) {
@@ -68,9 +72,15 @@ export async function renderPages() {
    else if(entry.isFile()&&entry.name.endsWith('.html')){
     let html=await readFile(file,'utf8');
     html=html.replace(/<link\b[^>]*\brel=["'](?:icon|shortcut icon|apple-touch-icon)["'][^>]*>/gi,'').replace(/<meta\b[^>]*name="theme-color"[^>]*>/gi,'');
-    const page=socialPages[path.relative(root,file).split(path.sep).join('/')];
+    const relative=path.relative(root,file).split(path.sep).join('/');
+    const page=socialPages[relative];
     if(page)html=html.replace(/<meta\b[^>]*\b(?:property|name)=["'](?:og|twitter):[^"']*["'][^>]*>/gi,'');
-    html=html.replace('</head>',icons+(page?socialMeta(page):'')+'</head>');
+    // Normalize existing tags too, so repeated builds never add duplicate trackers.
+    html=html.replace(/<script\b[^>]*\bsrc=["']https:\/\/vt\.hamann-kollegen\.de\/(?:tracker|cookie)\.js\?[^"']*["'][^>]*>\s*<\/script>/gi,'');
+    html=html.replace(/<script\b[^>]*\bsrc=["']\/webinar-mailing-context\.js["'][^>]*>\s*<\/script>/gi,'');
+    const mailing=mailingPages.has(relative)?'<script src="/webinar-mailing-context.js"></script>':'';
+    html=html.replace('</head>',icons+(page?socialMeta(page):'')+mailing+trackingScript('tracker')+'</head>');
+    html=html.replace('</body>',trackingScript('cookie')+'</body>');
     await writeFile(file,html);
    }
   }

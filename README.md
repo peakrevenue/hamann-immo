@@ -154,3 +154,9 @@ Der eigene Empfänger wird als `HAMANN_ZAPIER_WEBINAR_SURVEY_WEBHOOK_URL` konfig
 Videos und Social-Links stehen in `content/webinar-videos.mjs`. Verifizierte Quellen: [offizieller YouTube-Kanal](https://www.youtube.com/@hamannkollegen/videos), [ausführliches Immobiliengespräch](https://www.youtube.com/watch?v=Z54_o3WYvUU), [Eigenkapital und Finanzierung](https://www.youtube.com/watch?v=UtI54YtnX6w), [Instagram](https://www.instagram.com/hamann_kollegen_immobilien/). Auswahl nach Themenpassung, keine Behauptung über interne Performance-Zahlen. YouTube wird erst nach Klick als `youtube-nocookie.com`-Player geladen; direkte Videolinks bleiben verfügbar.
 
 Neue Vorlagen: `templates/workshop-umfrage.html`, `templates/workshop-umfrage-danke.html`. Gemeinsame Karten, Kalender-Icons und Videoelemente: `scripts/webinar-components.mjs`. Gestaltung: `wireframe/perspective-abstrakt/workshop/followup.css`. Alle Danke-/Umfrage-Seiten bleiben `noindex` und außerhalb der Sitemap.
+
+## Tracking auf allen Projektseiten
+
+Der zentrale Seitenaufbau in `scripts/render-pages.mjs` bindet auf jeder veröffentlichten HTML-Seite einschließlich Admin genau einmal `tracker.js` im Head und `cookie.js` am Ende des Bodys ein. Beide Skripte laden asynchron von `https://vt.hamann-kollegen.de` mit der Site-ID `VT-C5735E4A-66884`. Bestehende Einbindungen werden beim Build normalisiert, damit wiederholte Builds keine Doppelzählung durch zusätzliche Script-Tags verursachen.
+
+Auf den drei Webinar-Folgeseiten liest `webinar-mailing-context.js` die Kontaktparameter vor dem Tracker ein und entfernt sie aus der URL. Die Vorbelegung wird nur bis zur Übernahme durch das Seiten-Skript im Arbeitsspeicher gehalten. Kampagnenparameter und URL-Fragmente bleiben erhalten.
