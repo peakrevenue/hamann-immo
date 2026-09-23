@@ -52,7 +52,7 @@ export async function renderPages() {
  const press = home.match(/<div class="press-strip"[\s\S]*?<\/div><\/div>/)?.[0];
  const shortProof = home.match(/<section class="wide proof-grid"[\s\S]*?<\/section>/)?.[0];
  if(!press||!shortProof)throw Error('Gemeinsame Vertrauenselemente fehlen im Home-Template.');
- for(const [template,target,isWebinar] of [['home.html','index.html',false],['workshop.html','workshop/index.html',true],['workshop-danke.html','workshop/danke/index.html',true],['workshop-umfrage.html','workshop/umfrage/index.html',true],['workshop-umfrage-danke.html','workshop/umfrage/danke/index.html',true]]){
+ for(const [template,target,isWebinar] of [['home.html','index.html',false],['workshop.html','workshop/index.html',true],['workshop-danke.html','workshop-danke.html',true],['workshop-umfrage.html','workshop-umfrage.html',true],['workshop-umfrage-danke.html','workshop-umfrage-danke.html',true]]){
   let html = await readFile('templates/'+template,'utf8');
   const questions = isWebinar ? webinarQuestions : homeQuestions;
   for(const [marker,value] of Object.entries({ICONS:icons,STRUCTURED_DATA:structuredData(isWebinar,questions),TESTIMONIALS:testimonials(isWebinar),FAQ:faq(questions),PRESS:press.replaceAll('src="assets/','src="/assets/'),SHORT_PROOF:shortProof.replaceAll('src="assets/','src="/assets/').replace('Cashflow – mal','Cashflow: mal').replace(/<a class="proof-link"[\s\S]*?<\/a>/g,''),FOOTER:footer(),CHECK_ICON:icon('check'),CALENDAR_ICON:icon('calendar'),MAIL_ICON:icon('mail'),ARROW_ICON:icon('arrow'),PREPARATION:stepCards(),SURVEY_FIELDS:surveyFields(surveyQuestions),PREP_VIDEOS:preparationVideos()}))html=html.replaceAll('<!-- '+marker+' -->',value);

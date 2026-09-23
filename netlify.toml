@@ -24,8 +24,57 @@
   to = "/termin/"
   status = 301
   force = true
+
 [[redirects]]
   from = "/danke/"
   to = "/termin/"
   status = 301
+  force = true
+
+# Flat webinar follow-up URLs, including redirects for links already sent.
+# Netlify also matches trailing slashes and preserves query parameters.
+[[redirects]]
+  from = "/workshop/danke"
+  to = "/workshop-danke"
+  status = 301
+  force = true
+[[redirects]]
+  from = "/workshop/danke/index.html"
+  to = "/workshop-danke"
+  status = 301
+  force = true
+[[redirects]]
+  from = "/workshop/umfrage"
+  to = "/workshop-umfrage"
+  status = 301
+  force = true
+[[redirects]]
+  from = "/workshop/umfrage/index.html"
+  to = "/workshop-umfrage"
+  status = 301
+  force = true
+[[redirects]]
+  from = "/workshop/umfrage/danke"
+  to = "/workshop-umfrage-danke"
+  status = 301
+  force = true
+[[redirects]]
+  from = "/workshop/umfrage/danke/index.html"
+  to = "/workshop-umfrage-danke"
+  status = 301
+  force = true
+[[redirects]]
+  from = "/workshop-danke"
+  to = "/workshop-danke.html"
+  status = 200
+  force = true
+[[redirects]]
+  from = "/workshop-umfrage"
+  to = "/workshop-umfrage.html"
+  status = 200
+  force = true
+[[redirects]]
+  from = "/workshop-umfrage-danke"
+  to = "/workshop-umfrage-danke.html"
+  status = 200
   force = true

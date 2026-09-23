@@ -16,7 +16,7 @@ function setup(t){
 test('normal registration prefills survey through its cookie and sends answers only to the survey hook',async t=>{
  const s=setup(t);await s.call('webinar/register',{firstName:'Max',lastName:'Mustermann',email:answers.email,phone:'015123456789',country:'DE'});
  const context=await s.call('webinar/survey-context',{});assert.equal(context.email,answers.email);assert.equal(context.firstName,'Max');assert.match(context.cookie,/HttpOnly/);
- const response=await s.call('webinar/survey',answers);assert.equal(response.status,200);assert.equal(response.next,'/workshop/umfrage/danke/');
+ const response=await s.call('webinar/survey',answers);assert.equal(response.status,200);assert.equal(response.next,'/workshop-umfrage-danke');
  assert.equal(s.sent.length,2);assert.equal(s.sent[1].url,s.config.webinarSurveyWebhookUrl);assert.equal(s.sent[1].payload.event,'webinar_survey_completed');assert.equal(s.sent[1].payload.role,'Angestellt');assert.deepEqual(s.sent[1].payload.goals,['Langfristig Vermögen aufbauen','Für meine Rente vorsorgen']);assert.equal(s.sent[1].payload.utm_source,'klaviyo');assert.ok(s.sent[1].payload.registration_id);assert.equal((await s.call('webinar/survey-confirmation')).completed,true);
  await s.call('webinar/survey',answers);assert.equal(s.sent.length,2);assert.equal((await s.store.list('surveys/')).length,1);
 });

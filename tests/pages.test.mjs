@@ -31,7 +31,10 @@ test('all page assets resolve, favicon is shared and private routes remain noind
   for(const [,url]of html.matchAll(/(?:src|href)="([^"#?]+)(?:[?#][^"]*)?"/g)){
    if(/^(?:https?:|mailto:|tel:|data:|#)/.test(url))continue;
    const target=url.startsWith('/')?path.join(root,url):path.join(path.dirname(file),url);
-   await assert.doesNotReject(access(target),`${rel}: ${url}`);
+   await assert.doesNotReject(access(target).catch(error=>{
+    if(error.code==='ENOENT'&&!path.extname(target))return access(target+'.html');
+    throw error;
+   }),`${rel}: ${url}`);
   }
  }}}
  await scan(root);
@@ -43,8 +46,8 @@ test('calendar export uses the correct German event time and valid CRLF folding'
  assert.ok(ics.endsWith('END:VCALENDAR\r\n'));for(const line of ics.split('\r\n'))assert.ok(Buffer.byteLength(line)<=75);
 });
 test('follow-up pages contain three steps, separate survey, and click-to-load video embeds',async()=>{
- const thanks=await readFile(root+'/workshop/danke/index.html','utf8');assert.equal((thanks.match(/class="preparation-card/g)||[]).length,3);assert.doesNotMatch(thanks,/delivery-note|register-mailing|campaign-registration/);assert.match(thanks,/\/workshop\/umfrage\//);assert.match(thanks,/id="outlook-calendar"/);assert.doesNotMatch(thanks,/<iframe/);
+ const thanks=await readFile(root+'/workshop-danke.html','utf8');assert.equal((thanks.match(/class="preparation-card/g)||[]).length,3);assert.doesNotMatch(thanks,/delivery-note|register-mailing|campaign-registration/);assert.match(thanks,/href="\/workshop-umfrage"/);assert.match(thanks,/id="outlook-calendar"/);assert.doesNotMatch(thanks,/<iframe/);
  const js=await readFile(root+'/webinar-thanks.js','utf8');assert.doesNotMatch(js,/webinar\/register/);
- const survey=await readFile(root+'/workshop/umfrage/index.html','utf8');assert.equal((survey.match(/class="survey-step"/g)||[]).length,6);assert.match(survey,/name="email"/);assert.doesNotMatch(survey,/name="(?:phone|firstName|lastName)"/);
+ const survey=await readFile(root+'/workshop-umfrage.html','utf8');assert.equal((survey.match(/class="survey-step"/g)||[]).length,6);assert.match(survey,/name="email"/);assert.doesNotMatch(survey,/name="(?:phone|firstName|lastName)"/);
  const workshopHTML=await readFile(root+'/workshop/index.html','utf8');assert.doesNotMatch(workshopHTML,/Kundeninterview ansehen/);
 });

@@ -18,7 +18,7 @@ export const socialPages = {
   'danke/index.html': ['strategy', '/termin/', 'Dein Analysegespräch mit Hamann & Kollegen', 'Wähle einen Termin für dein persönliches Gespräch über Immobilien als Kapitalanlage.'],
   'interesse/index.html': ['strategy', '/interesse/', 'Immobilien als Kapitalanlage | Hamann & Kollegen', 'Erfahre, für wen das persönliche Analysegespräch von Hamann & Kollegen geeignet ist.'],
   'workshop/index.html': ['webinar', '/workshop/', 'Deine erste vermietete Immobilie | Kostenloses Live-Webinar', 'Am 30. September um 19 Uhr: Wohnungen bewerten, Finanzierung verstehen und Risiken prüfen. 90 Minuten mit Henrik Hamann.'],
-  'workshop/danke/index.html': ['webinar', '/workshop/danke/', 'Deine Vorbereitung aufs Immobilien-Webinar', 'Speichere den Termin, teile deine Fragen mit uns und erhalte vorab Einblicke in unsere Immobilienstrategien.'],
-  'workshop/umfrage/index.html': ['webinar', '/workshop/umfrage/', 'Deine Fragen fürs Immobilien-Webinar', 'Teile deine Ziele und Fragen mit uns, damit wir die Beispiele und Antworten im Webinar auf die Teilnehmer vorbereiten können.'],
-  'workshop/umfrage/danke/index.html': ['webinar', '/workshop/umfrage/danke/', 'Einblicke vor dem Immobilien-Webinar | Hamann & Kollegen', 'Entdecke die Videos mit Henrik Hamann und die Erfahrungen unserer Kunden vor dem Immobilien-Webinar.'],
+  'workshop-danke.html': ['webinar', '/workshop-danke', 'Deine Vorbereitung aufs Immobilien-Webinar', 'Speichere den Termin, teile deine Fragen mit uns und erhalte vorab Einblicke in unsere Immobilienstrategien.'],
+  'workshop-umfrage.html': ['webinar', '/workshop-umfrage', 'Deine Fragen fürs Immobilien-Webinar', 'Teile deine Ziele und Fragen mit uns, damit wir die Beispiele und Antworten im Webinar auf die Teilnehmer vorbereiten können.'],
+  'workshop-umfrage-danke.html': ['webinar', '/workshop-umfrage-danke', 'Einblicke vor dem Immobilien-Webinar | Hamann & Kollegen', 'Entdecke die Videos mit Henrik Hamann und die Erfahrungen unserer Kunden vor dem Immobilien-Webinar.'],
 };

@@ -25,7 +25,7 @@ test('webinar saves all four fields, sends only to webinar hook and confirms thr
  const s=setup(t);
  assert.equal((await s.call('webinar/registration')).status,401);
  const response=await s.call('webinar/register',registration);
- assert.equal(response.status,200);assert.equal(response.next,'/workshop/danke/');assert.match(response.cookie,/HttpOnly/);assert.match(response.cookie,/Secure/);
+ assert.equal(response.status,200);assert.equal(response.next,'/workshop-danke');assert.match(response.cookie,/HttpOnly/);assert.match(response.cookie,/Secure/);
  const leads=await s.store.list('leads/');assert.equal(leads.length,1);assert.equal(leads[0].status,'webinar');assert.equal(leads[0].phone,'+4915123456789');assert.equal(leads[0].lastName,'Mustermann');
  assert.equal(s.sent.length,1);assert.equal(s.sent[0].url,s.config.webinarWebhookUrl);
  const payload=s.sent[0].payload;

@@ -60,7 +60,7 @@ export function createApi({store, config, fetcher=fetch}) {
           experiment:'webinar',variant:null,attribution:attribution({...previous?.attribution,...data.attribution})};
         await store.set('leads/'+id,lead);
         await queueEvent(store,config,lead,'webinar_registered',fetcher);
-        return json({ok:true,next:'/workshop/danke/'},200,{'Set-Cookie':cookie('hk_webinar',pack({kind:'webinar',id,exp:Date.now()+7*86400000}),req,7*86400)});
+        return json({ok:true,next:'/workshop-danke'},200,{'Set-Cookie':cookie('hk_webinar',pack({kind:'webinar',id,exp:Date.now()+7*86400000}),req,7*86400)});
       }
       if(path==='/webinar/registration'&&method==='GET') {
         const token=unpack(readCookie(req,'hk_webinar'));
@@ -104,7 +104,7 @@ export function createApi({store, config, fetcher=fetch}) {
         await store.set('surveys/'+id,survey);
         await queueEvent(store,config,survey,'webinar_survey_completed',fetcher);
         await store.set('webinar-contexts/'+id,{...saved,email,firstName:survey.firstName});
-        return json({ok:true,next:'/workshop/umfrage/danke/'},200,{'Set-Cookie':cookie('hk_webinar_survey',pack({kind:'webinar-survey',id,exp:Date.now()+7*86400000}),req,7*86400)});
+        return json({ok:true,next:'/workshop-umfrage-danke'},200,{'Set-Cookie':cookie('hk_webinar_survey',pack({kind:'webinar-survey',id,exp:Date.now()+7*86400000}),req,7*86400)});
       }
       if(path==='/webinar/survey-confirmation'&&method==='GET') {
         const token=unpack(readCookie(req,'hk_webinar_survey'));

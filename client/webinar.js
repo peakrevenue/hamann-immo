@@ -26,7 +26,7 @@ form.addEventListener('submit',async event=>{
  busy=true;submit.disabled=true;submit.textContent='Dein Platz wird gesichert …';error.textContent='';
  try{const data=Object.fromEntries(new FormData(form));const result=await request('webinar/register',{...data,attribution:readAttribution()});
  if(!result.ok)throw Error('Bitte versuche es erneut.');
- location.assign('/workshop/danke/');
+ location.assign('/workshop-danke');
  }catch(e){error.textContent=e.message;busy=false;submit.disabled=false;submit.textContent='Jetzt kostenlos anmelden';}
 });
 submit.disabled=false;

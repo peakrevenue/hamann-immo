@@ -106,7 +106,7 @@ Das Kontaktformular verwendet einen Datenschutzhinweis unter dem Button ohne Che
 
 ## Immobilien-Webinar
 
-`/workshop/` → Anmelde-Pop-up → `/api/webinar/register` → private Speicherung und eigene Zapier-Outbox → `/workshop/danke/`.
+`/workshop/` → Anmelde-Pop-up → `/api/webinar/register` → private Speicherung und eigene Zapier-Outbox → `/workshop-danke`.
 
 Termin: **30. September 2026, 19:00–20:30 Uhr, Europe/Berlin**. Die zentralen Veranstaltungsdaten liegen in `content/workshop.mjs`. Bei Terminänderungen auch die sichtbaren Texte in `templates/workshop.html` und `templates/workshop-danke.html` aktualisieren und neu bauen.
 
@@ -137,17 +137,19 @@ Prüfungen für das Webinar: Validierung, nur der vorgesehene Hook, UTM-Weiterga
 
 ## Webinar-Umfrage und Mailing-Einstieg
 
-`/workshop/danke/` bietet drei Schritte: Kalender speichern, Umfrage ausfüllen, Videos ansehen. Desktop zeigt drei Karten nebeneinander, mobile Ansichten stapeln sie. Die direkte Danke-Seite ist für bereits über Klaviyo/Zapier angemeldete Personen vorgesehen; sie erstellt **keine** weitere Webinar-Anmeldung.
+Alle drei Folgeseiten nutzen flache URLs ohne abschließenden Slash: `/workshop-danke`, `/workshop-umfrage` und `/workshop-umfrage-danke`. Die früheren Pfade unter `/workshop/` werden permanent weitergeleitet; E-Mail-, Vorschau- und Kampagnenparameter bleiben dabei erhalten.
 
-Klaviyo-Ziel: `https://immobilien.hamann-kollegen.de/workshop/danke/`. Optional `email` und `first_name` als URL-kodierte Parameter mitgeben. Beispielstruktur: `/workshop/danke/?email=URL_KODIERTE_ADRESSE&first_name=URL_KODIERTER_VORNAME&utm_source=klaviyo`. Diese Platzhalter sind keine Klaviyo-Template-Syntax. Die tatsächlich in Klaviyo verfügbaren Profilvariablen im Mailing verwenden. Kontaktdaten werden nach dem Einlesen aus der sichtbaren URL entfernt, die Seite sendet keinen Referrer und lädt keine externen Medien vor einer aktiven Wiedergabe. Die Adresse dient ausschließlich zur Vorbelegung; aus einer Adresse allein werden keine vorhandenen Kontaktdaten gelesen.
+`/workshop-danke` bietet drei Schritte: Kalender speichern, Umfrage ausfüllen, Videos ansehen. Desktop zeigt drei Karten nebeneinander, mobile Ansichten stapeln sie. Die direkte Danke-Seite ist für bereits über Klaviyo/Zapier angemeldete Personen vorgesehen; sie erstellt **keine** weitere Webinar-Anmeldung.
 
-`/workshop/umfrage/` fragt Situation, berufliche Rolle, Monatsnetto, Investment-Ziele (Mehrfachauswahl) und eine freiwillige Webinar-Frage ab. Im letzten Schritt wird nur die E-Mail bestätigt. Die Adresse stammt aus der Website-Anmeldung, aus dem Mailing-Link oder wird manuell eingegeben. Ein signiertes HttpOnly-Cookie ordnet einen kurzlebigen, privaten Vorbelegungsdatensatz zu. Die Umfrage ist freiwillig und führt zu keiner zusätzlichen Webinar-Anmeldung oder Qualifizierung.
+Klaviyo-Ziel: `https://immobilien.hamann-kollegen.de/workshop-danke`. Optional `email` und `first_name` als URL-kodierte Parameter mitgeben. Beispielstruktur: `/workshop-danke?email=URL_KODIERTE_ADRESSE&first_name=URL_KODIERTER_VORNAME&utm_source=klaviyo`. Diese Platzhalter sind keine Klaviyo-Template-Syntax. Die tatsächlich in Klaviyo verfügbaren Profilvariablen im Mailing verwenden. Kontaktdaten werden nach dem Einlesen aus der sichtbaren URL entfernt, die Seite sendet keinen Referrer und lädt keine externen Medien vor einer aktiven Wiedergabe. Die Adresse dient ausschließlich zur Vorbelegung; aus einer Adresse allein werden keine vorhandenen Kontaktdaten gelesen.
+
+`/workshop-umfrage` fragt Situation, berufliche Rolle, Monatsnetto, Investment-Ziele (Mehrfachauswahl) und eine freiwillige Webinar-Frage ab. Im letzten Schritt wird nur die E-Mail bestätigt. Die Adresse stammt aus der Website-Anmeldung, aus dem Mailing-Link oder wird manuell eingegeben. Ein signiertes HttpOnly-Cookie ordnet einen kurzlebigen, privaten Vorbelegungsdatensatz zu. Die Umfrage ist freiwillig und führt zu keiner zusätzlichen Webinar-Anmeldung oder Qualifizierung.
 
 `POST /api/webinar/survey` speichert Antworten privat unter `surveys/` und legt das Ereignis `webinar_survey_completed` in die Outbox. Es enthält deutsche Antworttexte, stabile Antwortcodes, `email`, den bekannten Vornamen, `registration_id` (nur bei passender Website-Anmeldung), UTM-Parameter und eine deduplizierbare `event_id`. Wiederholungen innerhalb derselben Umfragesitzung behalten dieselbe ID; geänderte Antworten erzeugen eine neue Revision. Bei Zapier nach `event_id` deduplizieren.
 
 Der eigene Empfänger wird als `HAMANN_ZAPIER_WEBINAR_SURVEY_WEBHOOK_URL` konfiguriert (lokal `webinarSurveyWebhookUrl`). Der vom Auftraggeber gelieferte Umfrage-Hook ist als eigene geheime Netlify-Variable für Functions im Produktionskontext hinterlegt; die private lokale Konfiguration enthält denselben Empfänger. Solange dieser Hook fehlt, bleiben Antworten und Versandaufträge gespeichert. Sie werden **nicht** ersatzweise an den Anmelde- oder Kontakt-Hook gesendet. Im Admin gibt es einen eigenen Bereich „Webinar-Umfragen“ und den Versandstatus. Nach Einrichten des Hooks können ausstehende Antworten über den Wiederholungsbutton versendet werden.
 
-`/workshop/umfrage/danke/` bestätigt eine gespeicherte Umfrage per signiertem Cookie, zeigt dieselben Vorbereitungsvideos und vorhandene Kundenstimmen. Ohne Übermittlung erscheint keine erfundene Erfolgsbestätigung. `?vorschau=1` zeigt die Erfolgsansicht als Designvorschau ohne zusätzliche Hinweisbanner und ohne eine Umfrage zu übermitteln.
+`/workshop-umfrage-danke` bestätigt eine gespeicherte Umfrage per signiertem Cookie, zeigt dieselben Vorbereitungsvideos und vorhandene Kundenstimmen. Ohne Übermittlung erscheint keine erfundene Erfolgsbestätigung. `?vorschau=1` zeigt die Erfolgsansicht als Designvorschau ohne zusätzliche Hinweisbanner und ohne eine Umfrage zu übermitteln.
 
 Videos und Social-Links stehen in `content/webinar-videos.mjs`. Verifizierte Quellen: [offizieller YouTube-Kanal](https://www.youtube.com/@hamannkollegen/videos), [ausführliches Immobiliengespräch](https://www.youtube.com/watch?v=Z54_o3WYvUU), [Eigenkapital und Finanzierung](https://www.youtube.com/watch?v=UtI54YtnX6w), [Instagram](https://www.instagram.com/hamann_kollegen_immobilien/). Auswahl nach Themenpassung, keine Behauptung über interne Performance-Zahlen. YouTube wird erst nach Klick als `youtube-nocookie.com`-Player geladen; direkte Videolinks bleiben verfügbar.
 
