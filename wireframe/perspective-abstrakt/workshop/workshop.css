@@ -4,3 +4,42 @@
 
 /* The source portrait ends at 75% of the image height. Cover that internal cut at every width. */
 .workshop-page .host-quote{margin:-21.2% 0 0}
+
+/* Keep video and registration together in the first viewport. */
+.workshop-page .hero{width:min(1100px,calc(100% - 48px));padding-top:28px}
+.workshop-page .hero .brand{margin-bottom:18px}
+.workshop-page .hero .audience{font-size:11px;letter-spacing:1px}
+.workshop-page .hero .badge{margin-top:12px;padding:7px 16px;font-size:11px;gap:10px}
+.workshop-page .hero .hero-headline{max-width:970px;margin:20px auto 26px;font-size:clamp(30px,3.05vw,42px);line-height:1.14;letter-spacing:-1.1px;text-wrap:balance}
+.workshop-hero-layout{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:32px;align-items:center}
+.workshop-vsl{position:relative;aspect-ratio:16 / 9;background:var(--navy);border:1px solid #dce2e7;border-radius:14px;overflow:hidden;box-shadow:0 12px 36px #1c355315}
+.workshop-vsl iframe{position:absolute;inset:0;display:block;width:100%;height:100%;border:0}
+.workshop-hero-copy{min-width:0}
+.workshop-page .hero .workshop-hero-copy .lead{font-size:18px;line-height:1.5;margin:0 0 22px;text-wrap:pretty}
+.workshop-hero-action .button{min-height:54px;padding:14px 22px;font-size:18px;gap:18px}
+.workshop-hero-action .micro{font-size:12px;margin:12px 0 0;line-height:1.4}
+.workshop-page .hero>.press-strip{margin-top:28px}
+@media(max-width:800px){
+ .workshop-page .hero{width:min(600px,calc(100% - 32px));padding-top:18px}
+ .workshop-page .hero .brand{width:170px;margin-bottom:14px}
+ .workshop-page .hero .audience{font-size:9px;line-height:1.4;letter-spacing:.8px}
+ .workshop-page .hero .badge{margin-top:10px;padding:5px 10px;font-size:10px;line-height:1.35;gap:4px 8px}
+ .workshop-page .hero .badge span{padding-left:8px}
+ .workshop-page .hero .hero-headline{font-size:clamp(22px,6.05vw,34px);line-height:1.13;letter-spacing:-.65px;margin:16px auto 18px}
+ .workshop-hero-layout{grid-template-columns:1fr;gap:14px}
+ .workshop-vsl{border-radius:10px}
+ .workshop-hero-copy{display:flex;flex-direction:column;align-items:stretch}
+ .workshop-hero-action{order:-1}
+ .workshop-hero-action .button{width:100%;max-width:390px;min-height:52px;padding:12px 16px;font-size:17px}
+ .workshop-hero-action .micro{font-size:11px;margin-top:9px}
+ .workshop-page .hero .workshop-hero-copy .lead{font-size:16px;line-height:1.5;margin:24px 0 0}
+ .workshop-page .hero>.press-strip{margin-top:22px}
+}
+@media(max-width:800px) and (max-height:650px){
+ .workshop-page .hero{padding-top:12px}
+ .workshop-page .hero .brand{width:150px;margin-bottom:10px}
+ .workshop-page .hero .hero-headline{font-size:clamp(20px,5.8vw,29px);margin-block:12px}
+ .workshop-page .hero .badge{margin-top:8px}
+ .workshop-vsl{width:min(100%,calc((100svh - 280px) * 16 / 9));min-width:220px;justify-self:center}
+ .workshop-hero-layout{gap:12px}
+}
