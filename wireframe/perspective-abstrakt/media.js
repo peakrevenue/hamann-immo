@@ -8,7 +8,27 @@
  }
  const video=document.getElementById('video1'),button=document.getElementById('toggleSound1');
  if(!video||!button)return;
- const update=()=>{const audible=!video.muted&&video.volume>0;const label=audible?'Ton ausschalten':'Ton anschalten';button.querySelector('span').textContent=label;button.setAttribute('aria-label',label);button.setAttribute('aria-pressed',String(audible));};
- button.addEventListener('click',()=>{const audible=!video.muted&&video.volume>0;video.muted=audible;if(!audible&&video.volume===0)video.volume=1;if(video.paused)video.play().catch(()=>{});update();});
- video.addEventListener('volumechange',update);video.addEventListener('error',()=>button.hidden=true);update();
+ video.controls=false;
+ let starting=false;
+ button.addEventListener('click',async()=>{
+  if(starting)return;
+  starting=true;button.disabled=true;
+  try{
+   video.pause();
+   video.currentTime=0;
+   video.muted=false;
+   video.volume=1;
+   video.loop=false;
+   await video.play();
+   video.controls=true;
+   button.hidden=true;
+  }catch{
+   video.muted=true;
+   video.controls=true;
+   button.querySelector('span').textContent='Erneut für Ton klicken';
+  }finally{
+   starting=false;button.disabled=false;
+  }
+ });
+ video.addEventListener('error',()=>{button.hidden=true;video.controls=true;});
 })();
