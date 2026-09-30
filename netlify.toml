@@ -31,50 +31,87 @@
   status = 301
   force = true
 
-# Flat webinar follow-up URLs, including redirects for links already sent.
-# Netlify also matches trailing slashes and preserves query parameters.
+# All webinar pages now lead directly to Zoom. Use temporary redirects so future events can reuse these URLs.
 [[redirects]]
-  from = "/workshop/danke"
-  to = "/workshop-danke"
-  status = 301
+  from = "/workshop"
+  to = "https://us06web.zoom.us/webinar/register/WN_wJ3OMFhKTveIxMwApmiQNw"
+  status = 302
   force = true
+
 [[redirects]]
-  from = "/workshop/danke/index.html"
-  to = "/workshop-danke"
-  status = 301
+  from = "/workshop/index.html"
+  to = "https://us06web.zoom.us/webinar/register/WN_wJ3OMFhKTveIxMwApmiQNw"
+  status = 302
   force = true
-[[redirects]]
-  from = "/workshop/umfrage"
-  to = "/workshop-umfrage"
-  status = 301
-  force = true
-[[redirects]]
-  from = "/workshop/umfrage/index.html"
-  to = "/workshop-umfrage"
-  status = 301
-  force = true
-[[redirects]]
-  from = "/workshop/umfrage/danke"
-  to = "/workshop-umfrage-danke"
-  status = 301
-  force = true
-[[redirects]]
-  from = "/workshop/umfrage/danke/index.html"
-  to = "/workshop-umfrage-danke"
-  status = 301
-  force = true
+
 [[redirects]]
   from = "/workshop-danke"
-  to = "/workshop-danke.html"
-  status = 200
+  to = "https://us06web.zoom.us/webinar/register/WN_wJ3OMFhKTveIxMwApmiQNw"
+  status = 302
   force = true
+
+[[redirects]]
+  from = "/workshop-danke.html"
+  to = "https://us06web.zoom.us/webinar/register/WN_wJ3OMFhKTveIxMwApmiQNw"
+  status = 302
+  force = true
+
 [[redirects]]
   from = "/workshop-umfrage"
-  to = "/workshop-umfrage.html"
-  status = 200
+  to = "https://us06web.zoom.us/webinar/register/WN_wJ3OMFhKTveIxMwApmiQNw"
+  status = 302
   force = true
+
+[[redirects]]
+  from = "/workshop-umfrage.html"
+  to = "https://us06web.zoom.us/webinar/register/WN_wJ3OMFhKTveIxMwApmiQNw"
+  status = 302
+  force = true
+
 [[redirects]]
   from = "/workshop-umfrage-danke"
-  to = "/workshop-umfrage-danke.html"
-  status = 200
+  to = "https://us06web.zoom.us/webinar/register/WN_wJ3OMFhKTveIxMwApmiQNw"
+  status = 302
+  force = true
+
+[[redirects]]
+  from = "/workshop-umfrage-danke.html"
+  to = "https://us06web.zoom.us/webinar/register/WN_wJ3OMFhKTveIxMwApmiQNw"
+  status = 302
+  force = true
+
+[[redirects]]
+  from = "/workshop/danke"
+  to = "https://us06web.zoom.us/webinar/register/WN_wJ3OMFhKTveIxMwApmiQNw"
+  status = 302
+  force = true
+
+[[redirects]]
+  from = "/workshop/danke/index.html"
+  to = "https://us06web.zoom.us/webinar/register/WN_wJ3OMFhKTveIxMwApmiQNw"
+  status = 302
+  force = true
+
+[[redirects]]
+  from = "/workshop/umfrage"
+  to = "https://us06web.zoom.us/webinar/register/WN_wJ3OMFhKTveIxMwApmiQNw"
+  status = 302
+  force = true
+
+[[redirects]]
+  from = "/workshop/umfrage/index.html"
+  to = "https://us06web.zoom.us/webinar/register/WN_wJ3OMFhKTveIxMwApmiQNw"
+  status = 302
+  force = true
+
+[[redirects]]
+  from = "/workshop/umfrage/danke"
+  to = "https://us06web.zoom.us/webinar/register/WN_wJ3OMFhKTveIxMwApmiQNw"
+  status = 302
+  force = true
+
+[[redirects]]
+  from = "/workshop/umfrage/danke/index.html"
+  to = "https://us06web.zoom.us/webinar/register/WN_wJ3OMFhKTveIxMwApmiQNw"
+  status = 302
   force = true

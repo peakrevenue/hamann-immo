@@ -28,10 +28,9 @@ http.createServer(async(req,res)=>{try{
  }
  let route=decodeURIComponent(url.pathname).replace(/^\/wireframe\/perspective-abstrakt/,'');
  if(/^\/danke\/?$/.test(route)){res.writeHead(302,{Location:'/termin/'+url.search});res.end();return;}
- const legacyWebinarPages={'/workshop/danke':'/workshop-danke','/workshop/umfrage':'/workshop-umfrage','/workshop/umfrage/danke':'/workshop-umfrage-danke'};
- const normalized=route.replace(/\/index\.html$/,'').replace(/\/$/,'');
- if(legacyWebinarPages[normalized]){res.writeHead(301,{Location:legacyWebinarPages[normalized]+url.search});res.end();return;}
- if(Object.values(legacyWebinarPages).includes(normalized))route=normalized+'.html';
+ const webinarPages=new Set(['/workshop', '/workshop-danke', '/workshop-umfrage', '/workshop-umfrage-danke', '/workshop/danke', '/workshop/umfrage', '/workshop/umfrage/danke']);
+ const normalized=route.replace(/\/index\.html$/,'').replace(/\/$/,'').replace(/\.html$/,'');
+ if(webinarPages.has(normalized)){res.writeHead(302,{Location:'https://us06web.zoom.us/webinar/register/WN_wJ3OMFhKTveIxMwApmiQNw'+url.search});res.end();return;}
  if(route.endsWith('/'))route+='index.html';
  let file=path.resolve(root,'.'+route);if(!file.startsWith(root+path.sep)){res.writeHead(404);res.end();return;}
  if((await stat(file)).isDirectory()){if(!url.pathname.endsWith('/')){res.writeHead(302,{Location:url.pathname+'/'});res.end();return;}file=path.join(file,'index.html');}

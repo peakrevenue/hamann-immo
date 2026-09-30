@@ -106,6 +106,10 @@ Das Kontaktformular verwendet einen Datenschutzhinweis unter dem Button ohne Che
 
 ## Immobilien-Webinar
 
+**Seit 30. September 2026:** Alle Webinar-Seiten (Landingpage, Danke-Seite, Umfrage und Umfrage-Danke-Seite, einschließlich alter verschachtelter URLs und HTML-Adressen) leiten per HTTP 302 direkt auf https://us06web.zoom.us/webinar/register/WN_wJ3OMFhKTveIxMwApmiQNw weiter. Die Regeln stehen in `netlify.toml`; die lokale Vorschau bildet sie in `server/dev.mjs` ab. Auch der Landingpage-Link aus bereits gespeicherten Kalendereinträgen führt damit zu Zoom. Die bisherigen Seiten bleiben als Quellcode für spätere Veranstaltungen erhalten.
+
+Bisheriger Ablauf:
+
 `/workshop/` → Anmelde-Pop-up → `/api/webinar/register` → private Speicherung und eigene Zapier-Outbox → `/workshop-danke`.
 
 Termin: **30. September 2026, 19:00–20:30 Uhr, Europe/Berlin**. Die zentralen Veranstaltungsdaten liegen in `content/workshop.mjs`. Bei Terminänderungen auch die sichtbaren Texte in `templates/workshop.html` und `templates/workshop-danke.html` aktualisieren und neu bauen.
