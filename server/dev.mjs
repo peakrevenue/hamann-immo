@@ -4,6 +4,7 @@ import { randomBytes } from 'node:crypto';
 import path from 'node:path';
 import { fileStore } from './storage.mjs';
 import { createApi,passwordHash } from './api.mjs';
+import {workshopVariants,campaignRoutes} from '../content/workshop-campaign.mjs';
 import {flushOutbox} from './webhook.mjs';
 const root=path.resolve('wireframe/perspective-abstrakt');
 await mkdir('.local',{recursive:true,mode:0o700});
@@ -31,6 +32,8 @@ http.createServer(async(req,res)=>{try{
  const webinarPages=new Set(['/workshop', '/workshop-danke', '/workshop-umfrage', '/workshop-umfrage-danke', '/workshop/danke', '/workshop/umfrage', '/workshop/umfrage/danke']);
  const normalized=route.replace(/\/index\.html$/,'').replace(/\/$/,'').replace(/\.html$/,'');
  if(webinarPages.has(normalized)){res.writeHead(302,{Location:'https://us06web.zoom.us/webinar/register/WN_wJ3OMFhKTveIxMwApmiQNw'+url.search});res.end();return;}
+ const campaignPages=[...workshopVariants.map(v=>'/'+v.slug),campaignRoutes.thanks,campaignRoutes.survey,campaignRoutes.surveyThanks];
+ if(campaignPages.includes(normalized))route=normalized+'.html';
  if(route.endsWith('/'))route+='index.html';
  let file=path.resolve(root,'.'+route);if(!file.startsWith(root+path.sep)){res.writeHead(404);res.end();return;}
  if((await stat(file)).isDirectory()){if(!url.pathname.endsWith('/')){res.writeHead(302,{Location:url.pathname+'/'});res.end();return;}file=path.join(file,'index.html');}

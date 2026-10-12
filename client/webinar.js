@@ -1,7 +1,7 @@
 import { AsYouType } from 'libphonenumber-js/max';
 import { phoneNumber } from '../server/validation.mjs';
 import {readAttribution, request} from './attribution.js';
-import {workshop} from '../content/workshop.mjs';
+import {workshop} from '../content/workshop-campaign.mjs';
 const dialog=document.getElementById('webinar-anmeldung');
 const form=document.getElementById('webinar-form');
 const submit=document.getElementById('webinar-submit');
@@ -26,7 +26,7 @@ form.addEventListener('submit',async event=>{
  busy=true;submit.disabled=true;submit.textContent='Dein Platz wird gesichert …';error.textContent='';
  try{const data=Object.fromEntries(new FormData(form));const result=await request('webinar/register',{...data,attribution:readAttribution()});
  if(!result.ok)throw Error('Bitte versuche es erneut.');
- location.assign('/workshop-danke');
+ location.assign(result.next);
  }catch(e){error.textContent=e.message;busy=false;submit.disabled=false;submit.textContent='Jetzt kostenlos anmelden';}
 });
 submit.disabled=false;

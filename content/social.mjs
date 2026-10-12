@@ -1,4 +1,7 @@
+import {workshopVariants,campaignRoutes} from './workshop-campaign.mjs';
 export const socialImages = {
+  webinarSteuer:{path:'/assets/social/webinar-steuer-v1.png',alt:'Kostenloses Live-Webinar: Steuerlast mit Immobilien senken. 26. Oktober, 19 Uhr.'},
+  webinarEk:{path:'/assets/social/webinar-ek-v1.png',alt:'Kostenloses Live-Webinar: Vermietete Immobilie ohne Eigenkapital. 26. Oktober, 19 Uhr.'},
   strategy: {
     path: '/assets/social/immobilien-v1.png',
     alt: 'Hamann & Kollegen Immobilien: Immobilien als Kapitalanlage. Kostenloses Analysegespräch.',
@@ -22,3 +25,9 @@ export const socialPages = {
   'workshop-umfrage.html': ['webinar', '/workshop-umfrage', 'Deine Fragen fürs Immobilien-Webinar', 'Teile deine Ziele und Fragen mit uns, damit wir die Beispiele und Antworten im Webinar auf die Teilnehmer vorbereiten können.'],
   'workshop-umfrage-danke.html': ['webinar', '/workshop-umfrage-danke', 'Einblicke vor dem Immobilien-Webinar | Hamann & Kollegen', 'Entdecke die Videos mit Henrik Hamann und die Erfahrungen unserer Kunden vor dem Immobilien-Webinar.'],
 };
+
+for(const variant of workshopVariants) socialPages[variant.slug+'.html']=[variant.socialImage,'/'+variant.slug,variant.title,variant.subheadline];
+for(const [key,source] of [['thanks','workshop-danke.html'],['survey','workshop-umfrage.html'],['surveyThanks','workshop-umfrage-danke.html']]) {
+ const [, ,title,description]=socialPages[source];
+ socialPages[campaignRoutes[key].slice(1)+'.html']=['webinarSteuer',campaignRoutes[key],title,description];
+}

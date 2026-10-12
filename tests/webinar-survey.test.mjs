@@ -4,7 +4,7 @@ import {createApi} from '../server/api.mjs';
 import {flushOutbox} from '../server/webhook.mjs';
 const answers={email:'max@example.invalid',situation:'first-property',role:'employed',income:'3500to5000',goals:['wealth','retirement'],question:'Wie viel Rücklage sollte ich einplanen?',attribution:{utm_source:'klaviyo'}};
 function setup(t){
- t.mock.timers.enable({apis:['Date'],now:new Date('2026-09-22T10:00:00Z')});
+ t.mock.timers.enable({apis:['Date'],now:new Date('2026-10-12T10:00:00Z')});
  const db=new Map(),sent=[],cookies={};let offline=false;
  const store={get:async k=>structuredClone(db.get(k)||null),set:async(k,v)=>db.set(k,structuredClone(v)),create:async(k,v)=>{if(!db.has(k))db.set(k,structuredClone(v));},list:async p=>[...db].filter(([k])=>k.startsWith(p)).map(([,v])=>structuredClone(v)),delete:async k=>db.delete(k)};
  const config={secret:'survey-test-secret-longer-than-32-characters',webhookUrl:'https://hooks.zapier.com/hooks/catch/test/contact/',webinarWebhookUrl:'https://hooks.zapier.com/hooks/catch/test/webinar/',webinarSurveyWebhookUrl:'https://hooks.zapier.com/hooks/catch/test/survey/'};
@@ -16,7 +16,7 @@ function setup(t){
 test('normal registration prefills survey through its cookie and sends answers only to the survey hook',async t=>{
  const s=setup(t);await s.call('webinar/register',{firstName:'Max',lastName:'Mustermann',email:answers.email,phone:'015123456789',country:'DE'});
  const context=await s.call('webinar/survey-context',{});assert.equal(context.email,answers.email);assert.equal(context.firstName,'Max');assert.match(context.cookie,/HttpOnly/);
- const response=await s.call('webinar/survey',answers);assert.equal(response.status,200);assert.equal(response.next,'/workshop-umfrage-danke');
+ const response=await s.call('webinar/survey',answers);assert.equal(response.status,200);assert.equal(response.next,'/workshop-oktober-umfrage-danke');
  assert.equal(s.sent.length,2);assert.equal(s.sent[1].url,s.config.webinarSurveyWebhookUrl);assert.equal(s.sent[1].payload.event,'webinar_survey_completed');assert.equal(s.sent[1].payload.role,'Angestellt');assert.deepEqual(s.sent[1].payload.goals,['Langfristig Vermögen aufbauen','Für meine Rente vorsorgen']);assert.equal(s.sent[1].payload.utm_source,'klaviyo');assert.ok(s.sent[1].payload.registration_id);assert.equal((await s.call('webinar/survey-confirmation')).completed,true);
  await s.call('webinar/survey',answers);assert.equal(s.sent.length,2);assert.equal((await s.store.list('surveys/')).length,1);
 });

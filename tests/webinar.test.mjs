@@ -2,11 +2,11 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createApi} from '../server/api.mjs';
 import {flushOutbox} from '../server/webhook.mjs';
-import {workshop} from '../content/workshop.mjs';
+import {workshop} from '../content/workshop-campaign.mjs';
 
-const registration = {firstName:'Max',lastName:'Mustermann',email:'max@example.invalid',phone:'015123456789',country:'DE',attribution:{utm_source:'meta',utm_campaign:'webinar-september',utm_custom:'creative-4'}};
+const registration = {firstName:'Max',lastName:'Mustermann',email:'max@example.invalid',phone:'015123456789',country:'DE',attribution:{utm_source:'meta',utm_campaign:'webinar-oktober',utm_custom:'creative-4'}};
 function setup(t) {
- t.mock.timers.enable({apis:['Date'],now:new Date('2026-09-22T10:00:00Z')});
+ t.mock.timers.enable({apis:['Date'],now:new Date('2026-10-12T10:00:00Z')});
  const db=new Map(),sent=[],cookies={};
  let offline=false;
  const store={get:async k=>structuredClone(db.get(k)||null),set:async(k,v)=>db.set(k,structuredClone(v)),create:async(k,v)=>{if(!db.has(k))db.set(k,structuredClone(v));},list:async p=>[...db].filter(([k])=>k.startsWith(p)).map(([,v])=>structuredClone(v)),delete:async k=>db.delete(k)};
@@ -25,7 +25,7 @@ test('webinar saves all four fields, sends only to webinar hook and confirms thr
  const s=setup(t);
  assert.equal((await s.call('webinar/registration')).status,401);
  const response=await s.call('webinar/register',registration);
- assert.equal(response.status,200);assert.equal(response.next,'/workshop-danke');assert.match(response.cookie,/HttpOnly/);assert.match(response.cookie,/Secure/);
+ assert.equal(response.status,200);assert.equal(response.next,'/workshop-oktober-danke');assert.match(response.cookie,/HttpOnly/);assert.match(response.cookie,/Secure/);
  const leads=await s.store.list('leads/');assert.equal(leads.length,1);assert.equal(leads[0].status,'webinar');assert.equal(leads[0].phone,'+4915123456789');assert.equal(leads[0].lastName,'Mustermann');
  assert.equal(s.sent.length,1);assert.equal(s.sent[0].url,s.config.webinarWebhookUrl);
  const payload=s.sent[0].payload;
@@ -80,6 +80,6 @@ test('expired webinar rejects new registrations and rate limit blocks repeated s
  const s=setup(t);
  for(let i=0;i<12;i++)await s.call('webinar/register',{...registration,firstName:''});
  assert.equal((await s.call('webinar/register',registration)).status,429);
- t.mock.timers.setTime(Date.parse('2026-10-01T00:00:00Z'));
+ t.mock.timers.setTime(Date.parse(workshop.end)+1);
  assert.equal((await s.call('webinar/register',registration,{ip:'other'})).status,410);assert.equal(s.sent.length,0);
 });

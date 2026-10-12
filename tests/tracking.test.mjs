@@ -26,7 +26,7 @@ test('all published pages include the exact tracker once in head and cookie scri
    const start=html.indexOf('<'+section),end=html.indexOf('</'+section+'>');
    assert.ok(html.slice(start,end).includes(tags[0]),file+' '+section);
   }
-  if(/^workshop-(?:danke|umfrage|umfrage-danke)\.html$/.test(path.basename(file))) {
+  if(/^workshop-(?:oktober-)?(?:danke|umfrage|umfrage-danke)\.html$/.test(path.basename(file))) {
    const bootstrap='<script src="/webinar-mailing-context.js"></script>';
    assert.ok(html.includes(bootstrap));
    assert.ok(html.indexOf(bootstrap)<html.indexOf('https://vt.hamann-kollegen.de/tracker.js'));

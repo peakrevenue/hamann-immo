@@ -2,11 +2,12 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFile, readdir, access} from 'node:fs/promises';
 import path from 'node:path';
+import {workshop as octoberWorkshop} from '../content/workshop-campaign.mjs';
 import {workshop} from '../content/workshop.mjs';
 
 const root='wireframe/perspective-abstrakt';
 test('public pages expose testimonials, FAQ and matching structured data without JavaScript',async()=>{
- for(const file of ['index.html','workshop/index.html']){
+ for(const file of ['index.html','workshop/index.html','workshop-steuer.html','workshop-ek.html']){
   const html=await readFile(path.join(root,file),'utf8');
   assert.equal((html.match(/<h1\b/g)||[]).length,1);
   assert.equal((html.match(/class="case testimonial"/g)||[]).length,4);
@@ -18,7 +19,7 @@ test('public pages expose testimonials, FAQ and matching structured data without
   assert.equal(faq.mainEntity.length,8);
   for(const item of faq.mainEntity){assert.ok(html.includes(item.name));assert.ok(html.includes(item.acceptedAnswer.text));}
   if(file.startsWith('workshop')){
-   const event=json['@graph'].find(node=>node['@type']==='EducationEvent');assert.equal(event.startDate,workshop.start);assert.equal(event.endDate,workshop.end);assert.equal(event.offers.price,0);
+   const event=json['@graph'].find(node=>node['@type']==='EducationEvent'),expected=file==='workshop/index.html'?workshop:octoberWorkshop;assert.equal(event.startDate,expected.start);assert.equal(event.endDate,expected.end);assert.equal(event.offers.price,0);
    assert.doesNotMatch(html,/src="\/?site.js"|data-funnel-cta|hooks.zapier.com/);
    assert.match(html,/href="#anmelden" data-webinar-open/);
   }
@@ -27,7 +28,7 @@ test('public pages expose testimonials, FAQ and matching structured data without
 test('all page assets resolve, favicon is shared and private routes remain noindex',async()=>{
  async function scan(directory){for(const item of await readdir(directory,{withFileTypes:true})){const file=path.join(directory,item.name);if(item.isDirectory()&&item.name!=='assets')await scan(file);else if(item.isFile()&&item.name.endsWith('.html')){
   const html=await readFile(file,'utf8');assert.match(html,/href="\/favicon.png"/);
-  const rel=path.relative(root,file);if(!['index.html','workshop/index.html'].includes(rel))assert.match(html,/<meta name="robots" content="noindex/);
+  const rel=path.relative(root,file);if(!['index.html','workshop/index.html','workshop-steuer.html','workshop-ek.html'].includes(rel))assert.match(html,/<meta name="robots" content="noindex/);
   for(const [,url]of html.matchAll(/(?:src|href)="([^"#?]+)(?:[?#][^"]*)?"/g)){
    if(/^(?:https?:|mailto:|tel:|data:|#)/.test(url))continue;
    const target=url.startsWith('/')?path.join(root,url):path.join(path.dirname(file),url);
@@ -38,7 +39,7 @@ test('all page assets resolve, favicon is shared and private routes remain noind
   }
  }}}
  await scan(root);
- const sitemap=await readFile(root+'/sitemap.xml','utf8');assert.equal((sitemap.match(/<loc>/g)||[]).length,2);assert.ok(sitemap.includes(workshop.url));
+ const sitemap=await readFile(root+'/sitemap.xml','utf8');assert.equal((sitemap.match(/<loc>/g)||[]).length,4);assert.ok(sitemap.includes(workshop.url));
  const robots=await readFile(root+'/robots.txt','utf8');assert.match(robots,/User-agent: \*\nAllow: \//);assert.doesNotMatch(robots,/Disallow: \/\s*$/m);
 });
 test('calendar export uses the correct German event time and valid CRLF folding',async()=>{

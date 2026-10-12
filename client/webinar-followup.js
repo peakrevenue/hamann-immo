@@ -1,5 +1,5 @@
 import {request} from './attribution.js';
-import {workshop} from '../content/workshop.mjs';
+import {workshop} from '../content/workshop-campaign.mjs';
 // A supplied email is only prefill data. It never authorizes contact retrieval.
 export function takeMailingContext(scope=globalThis) {
   if(scope.__hkWebinarMailing){const saved=scope.__hkWebinarMailing;delete scope.__hkWebinarMailing;return saved;}

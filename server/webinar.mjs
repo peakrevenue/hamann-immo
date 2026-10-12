@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
 import { phoneNumber } from './validation.mjs';
-import { workshop } from '../content/workshop.mjs';
+import { workshop } from '../content/workshop-campaign.mjs';
 
 export function validateWebinar(data) {
   for (const key of ['firstName', 'lastName']) {

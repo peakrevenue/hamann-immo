@@ -47,6 +47,8 @@ export async function renderSocialAssets() {
   const date = new Intl.DateTimeFormat('de-DE',{day:'numeric',month:'long',timeZone:workshop.timeZone}).format(new Date(workshop.start));
   const hour = new Intl.DateTimeFormat('de-DE',{hour:'numeric',timeZone:workshop.timeZone}).formatToParts(new Date(workshop.start)).find(part=>part.type==='hour').value;
   const cards = {
+    webinarSteuer:{eyebrow:'KOSTENLOSES LIVE-WEBINAR',lines:['Unter 10 % Steuern','als Angestellter'],detail:'26. Oktober · 19 Uhr',footer:'90 Minuten mit Henrik Hamann'},
+    webinarEk:{eyebrow:'KOSTENLOSES LIVE-WEBINAR',lines:['Immobilie ohne','Eigenkapital'],detail:'26. Oktober · 19 Uhr',footer:'90 Minuten mit Henrik Hamann'},
     strategy:{eyebrow:'DEINE IMMOBILIENSTRATEGIE',lines:['Immobilien als','Kapitalanlage'],detail:'Kostenloses Analysegespräch',footer:'Persönlich. Mit Hamann & Kollegen.'},
     webinar:{eyebrow:'KOSTENLOSES LIVE-WEBINAR',lines:['Deine erste','vermietete Immobilie'],detail:`${date} · ${hour} Uhr`,footer:`${workshop.duration} mit ${workshop.host}`},
   };

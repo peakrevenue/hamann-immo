@@ -106,7 +106,11 @@ Das Kontaktformular verwendet einen Datenschutzhinweis unter dem Button ohne Che
 
 ## Immobilien-Webinar
 
-**Seit 30. September 2026:** Alle Webinar-Seiten (Landingpage, Danke-Seite, Umfrage und Umfrage-Danke-Seite, einschließlich alter verschachtelter URLs und HTML-Adressen) leiten per HTTP 302 direkt auf https://us06web.zoom.us/webinar/register/WN_wJ3OMFhKTveIxMwApmiQNw weiter. Die Regeln stehen in `netlify.toml`; die lokale Vorschau bildet sie in `server/dev.mjs` ab. Auch der Landingpage-Link aus bereits gespeicherten Kalendereinträgen führt damit zu Zoom. Die bisherigen Seiten bleiben als Quellcode für spätere Veranstaltungen erhalten.
+**Oktober-Kampagne:** `/workshop-steuer` und `/workshop-ek` sind eigenständige Varianten derselben Landingpage. Nur Headline, Subheadline, passende Metadaten und der bestätigte Termin **Montag, 26. Oktober 2026, 19:00–20:30 Uhr (Europe/Berlin, UTC+1)** unterscheiden sich. Copy und Veranstaltungsdaten stehen in `content/workshop-campaign.mjs`; die Seiten werden aus der bestehenden Workshop-Vorlage gebaut.
+
+Neue Anmeldungen und Umfragen verwenden die Veranstaltungs-ID `immobilien-workshop-2026-10-26` und die bestehenden separaten Webhooks. Nach der Anmeldung folgt `/workshop-oktober-danke`, danach `/workshop-oktober-umfrage` und `/workshop-oktober-umfrage-danke`. Der Kalenderexport liegt unter `/workshop-oktober.ics`. Die vorherigen September-Adressen behalten ihre Zoom-Weiterleitung. Der externe Versand der Zugangsmails und der passende Oktober-Zoom-Link werden weiterhin in Klaviyo/Zapier verwaltet.
+
+**Seit 30. September 2026:** Die ursprünglichen Webinar-Seiten (Landingpage, Danke-Seite, Umfrage und Umfrage-Danke-Seite, einschließlich alter verschachtelter URLs und HTML-Adressen) leiten per HTTP 302 direkt auf https://us06web.zoom.us/webinar/register/WN_wJ3OMFhKTveIxMwApmiQNw weiter. Die Regeln stehen in `netlify.toml`; die lokale Vorschau bildet sie in `server/dev.mjs` ab. Auch der Landingpage-Link aus bereits gespeicherten Kalendereinträgen führt damit zu Zoom. Die bisherigen Seiten bleiben als Quellcode für spätere Veranstaltungen erhalten.
 
 Bisheriger Ablauf:
 

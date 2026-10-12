@@ -1,6 +1,6 @@
 import {createHash} from 'node:crypto';
 import {surveyQuestions,surveyAnswerLabels} from '../content/webinar-survey.mjs';
-import {workshop} from '../content/workshop.mjs';
+import {workshop} from '../content/workshop-campaign.mjs';
 
 export function contactEmail(value) {
   if(typeof value!=='string')return null;
